@@ -1,1 +1,20 @@
-@extends('layouts.app') @section('content')<div class="container py-5"><div class="mx-auto bg-white border rounded-4 p-5 text-center shadow-sm" style="max-width:900px"><div class="text-uppercase text-muted">Цифровой образовательный ресурс «Педслово»</div><h1 class="display-5 mt-4">СЕРТИФИКАТ</h1><p class="lead mt-4">Настоящим подтверждается, что</p><h2>{{ $certificate->user->name }}</h2><p class="lead">успешно завершил(а) курс</p><h3>«{{ $certificate->course->title }}»</h3>@if($certificate->score!==null)<p class="mt-3">Итоговый балл: {{ $certificate->score }}</p>@endif<div class="row mt-5 text-start"><div class="col">№ {{ $certificate->number }}</div><div class="col text-end">{{ $certificate->issued_at->format('d.m.Y') }}</div></div></div></div>@endsection
+@extends('layouts.app')
+
+@section('title','Сертификат — '.$certificate->course->title)
+
+@section('content')
+<div class="container py-5">
+    <div class="mx-auto bg-white border rounded-4 p-5 text-center shadow-sm" style="max-width:900px">
+        <div class="text-uppercase text-muted">Цифровой образовательный ресурс «Педслово»</div>
+        <h1 class="display-5 mt-4">СЕРТИФИКАТ</h1>
+        <p class="lead mt-4">Настоящим подтверждается, что</p>
+        <h2>{{ $certificate->user->name }}</h2>
+        <p class="lead">успешно завершил(а) курс</p>
+        <h3>«{{ $certificate->course->title }}»</h3>
+        @if($certificate->score !== null)
+            <p class="mt-3">Итоговый балл: {{ $certificate->score }}</p>
+        @endif
+        <div class="row mt-5 text-start"><div class="col">№ {{ $certificate->number }}</div><div class="col text-end">{{ $certificate->issued_at->format('d.m.Y') }}</div></div>
+    </div>
+</div>
+@endsection

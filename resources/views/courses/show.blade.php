@@ -1,2 +1,40 @@
 @extends('layouts.app')
-@section('content')<div class="container py-5"><a href="{{ url()->previous() }}" class="text-decoration-none">← Назад</a><div class="row mt-3"><div class="col-lg-8"><h1>{{ $course->title }}</h1><p class="lead">{{ $course->description }}</p></div><div class="col-lg-4 text-lg-end">@auth @if(!$enrollment)<form method="post" action="{{ route('courses.enroll',$course) }}">@csrf<button class="btn btn-primary btn-lg">Записаться на курс</button></form>@else<span class="badge bg-success p-3">{{ $enrollment->status==='completed'?'Курс завершён':'Вы записаны' }}</span>@endif @endauth</div></div><hr><h3>Программа курса</h3><div class="list-group mt-3">@forelse($course->lessons as $lesson)<div class="list-group-item py-3"><div class="d-flex justify-content-between"><strong>{{ $loop->iteration }}. {{ $lesson->title }}</strong><span class="badge bg-secondary">{{ $lesson->lesson_type }}</span></div><p class="mb-2 text-muted">{{ $lesson->description }}</p>@auth @if($enrollment || auth()->user()->isAdmin())<a class="btn btn-outline-primary btn-sm" href="{{ route('learning.lesson',$lesson) }}">Открыть урок</a>@else<span class="small text-muted">Запишитесь на курс, чтобы открыть урок.</span>@endif @else<span class="small text-muted">Войдите, чтобы начать обучение.</span>@endauth</div>@empty<div class="alert alert-light">Материалы курса пока не добавлены.</div>@endforelse</div></div>@endsection
+
+@section('title',$course->title.' — Педслово')
+
+@section('content')
+<div class="container py-5">
+    <a href="{{ url()->previous() }}" class="text-decoration-none">← Назад</a>
+    <div class="row mt-3">
+        <div class="col-lg-8"><h1>{{ $course->title }}</h1><p class="lead">{{ $course->description }}</p></div>
+        <div class="col-lg-4 text-lg-end">
+            @auth
+                @if(!$enrollment)
+                    <form method="post" action="{{ route('courses.enroll',$course) }}">@csrf<button class="btn btn-primary btn-lg">Записаться на курс</button></form>
+                @else
+                    <span class="badge bg-success p-3">{{ $enrollment->status==='completed' ? 'Курс завершён' : 'Вы записаны' }}</span>
+                @endif
+            @endauth
+        </div>
+    </div>
+    <hr>
+    <h3>Программа курса</h3>
+    <div class="list-group mt-3">
+        @forelse($course->lessons as $lesson)
+            <div class="list-group-item py-3"><div class="d-flex justify-content-between"><strong>{{ $loop->iteration }}. {{ $lesson->title }}</strong><span class="badge bg-secondary">{{ $lesson->lesson_type }}</span></div><p class="mb-2 text-muted">{{ $lesson->description }}</p>
+                @auth
+                    @if($enrollment || auth()->user()->isAdmin())
+                        <a class="btn btn-outline-primary btn-sm" href="{{ route('learning.lesson',$lesson) }}">Открыть урок</a>
+                    @else
+                        <span class="small text-muted">Запишитесь на курс, чтобы открыть урок.</span>
+                    @endif
+                @else
+                    <span class="small text-muted">Войдите, чтобы начать обучение.</span>
+                @endauth
+            </div>
+        @empty
+            <div class="alert alert-light">Материалы курса пока не добавлены.</div>
+        @endforelse
+    </div>
+</div>
+@endsection

@@ -1,3 +1,20 @@
 @extends('layouts.app')
+
 @section('title','Мои курсы — Педслово')
-@section('content')<div class="container py-5"><h1>Мои курсы</h1><p class="text-muted">Ваши учебные программы и текущий прогресс.</p><div class="row g-4 mt-1">@forelse($enrollments as $e)@php($lessons=$e->course->lessons->where('is_active',true))@php($done=$lessons->filter(fn($l)=>in_array(optional($progress->get($l->id))->status,['completed','passed']))->count())@php($percent=$lessons->count()?round($done*100/$lessons->count()):0)<div class="col-md-6"><div class="card border-0 shadow-sm h-100"><div class="card-body p-4"><div class="d-flex justify-content-between"><h4>{{ $e->course->title }}</h4><span class="badge {{ $e->status==='completed'?'bg-success':'bg-primary' }}">{{ $e->status==='completed'?'Завершён':'Обучение' }}</span></div><div class="progress my-3" style="height:10px"><div class="progress-bar" style="width:{{ $percent }}%"></div></div><div class="text-muted mb-3">Пройдено {{ $done }} из {{ $lessons->count() }} уроков — {{ $percent }}%</div><a class="btn btn-outline-primary" href="{{ route('courses.show',$e->course) }}">Продолжить</a></div></div></div>@empty<div class="col-12"><div class="alert alert-light">Вы пока не записаны ни на один курс.</div></div>@endforelse</div></div>@endsection
+
+@section('content')
+<div class="container py-5">
+    <h1>Мои курсы</h1>
+    <p class="text-muted">Ваши учебные программы и текущий прогресс.</p>
+    <div class="row g-4 mt-1">
+        @forelse($enrollments as $e)
+            @php($lessons=$e->course->lessons->where('is_active',true))
+            @php($done=$lessons->filter(fn($l)=>in_array(optional($progress->get($l->id))->status,['completed','passed']))->count())
+            @php($percent=$lessons->count() ? round($done*100/$lessons->count()) : 0)
+            <div class="col-md-6"><div class="card border-0 shadow-sm h-100"><div class="card-body p-4"><div class="d-flex justify-content-between"><h4>{{ $e->course->title }}</h4><span class="badge {{ $e->status==='completed' ? 'bg-success' : 'bg-primary' }}">{{ $e->status==='completed' ? 'Завершён' : 'Обучение' }}</span></div><div class="progress my-3" style="height:10px"><div class="progress-bar" style="width:{{ $percent }}%"></div></div><div class="text-muted mb-3">Пройдено {{ $done }} из {{ $lessons->count() }} уроков — {{ $percent }}%</div><a class="btn btn-outline-primary" href="{{ route('courses.show',$e->course) }}">Продолжить</a></div></div></div>
+        @empty
+            <div class="col-12"><div class="alert alert-light">Вы пока не записаны ни на один курс.</div></div>
+        @endforelse
+    </div>
+</div>
+@endsection
