@@ -11,7 +11,7 @@
     <a href="{{ route('admin.courses.lessons.create',$course) }}" class="btn btn-primary">Добавить урок</a>
 </div>
 
-<div class="alert alert-light border mt-3">Перетаскивайте строки ↕ — порядок уроков сохранится автоматически. Файлы каждого урока лежат в собственной папке.</div>
+<div class="alert alert-light border mt-3">Перетаскивайте строки ↕ — порядок уроков сохранится автоматически. У каждого элемента урока можно отдельно задать обязательность.</div>
 
 <div class="card admin-card shadow-sm">
     <div class="table-responsive">
@@ -27,6 +27,7 @@
                     <td>{{ optional($lesson->material)->title ?: (optional($lesson->scormPackage)->title ?: ($lesson->files->first() ? $lesson->files->first()->original_name : '—')) }}</td>
                     <td>{{ $lesson->files->count() }}</td>
                     <td class="text-end">
+                        <a class="btn btn-sm btn-outline-warning" href="{{ route('admin.courses.lessons.requirements.edit',[$course,$lesson]) }}">Обязательность</a>
                         <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.courses.lessons.edit',[$course,$lesson]) }}">Изменить</a>
                         <form class="d-inline" method="post" action="{{ route('admin.courses.lessons.destroy',[$course,$lesson]) }}">
                             @csrf
