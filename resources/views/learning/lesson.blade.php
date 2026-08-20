@@ -26,6 +26,30 @@
                 </div>
             @endif
 
+            @if($lesson->links->count())
+                <h2 class="h4 mt-4">Видео урока</h2>
+                @foreach($lesson->links as $link)
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <strong>{{ $link->title ?: 'Видео' }}</strong>
+                                    <span class="badge text-bg-light ms-1">{{ $link->provider }}</span>
+                                </div>
+                                <a class="btn btn-sm btn-outline-secondary" href="{{ $link->url }}" target="_blank" rel="noopener">Открыть отдельно</a>
+                            </div>
+                            @if($link->embed_url)
+                                <div class="ratio ratio-16x9">
+                                    <iframe src="{{ $link->embed_url }}" title="{{ $link->title ?: 'Видео урока' }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                                </div>
+                            @else
+                                <div class="alert alert-light border mb-0">Видео доступно по внешней ссылке: <a href="{{ $link->url }}" target="_blank" rel="noopener">{{ $link->url }}</a></div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+
             @if($lesson->scormPackages->count())
                 <h2 class="h4 mt-4">Интерактивные задания и тесты</h2>
                 <div class="row g-3 mb-4">
