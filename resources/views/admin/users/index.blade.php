@@ -4,21 +4,72 @@
 
 @section('content')
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-    <div><div class="small-label">Администрирование</div><h1 class="mb-0">Пользователи</h1></div>
+    <div>
+        <div class="small-label">Администрирование</div>
+        <h1 class="mb-0">Пользователи</h1>
+        @if(($pendingCount ?? 0) > 0)
+            <div class="text-danger small mt-1">Ожидают подтверждения: {{ $pendingCount }}</div>
+        @endif
+    </div>
     <div class="d-flex gap-2">
         <a class="btn btn-outline-dark" href="{{ route('admin.users.credentials',request()->only(['q','group_id'])) }}">Пароли студентов / печать</a>
         <a class="btn btn-primary" href="{{ route('admin.users.create') }}">+ Создать пользователя</a>
     </div>
 </div>
-<form class="card admin-card shadow-sm p-3 mb-3"><div class="row g-2"><div class="col-md-4"><input class="form-control" name="q" value="{{ request('q') }}" placeholder="ФИО или email"></div><div class="col-md-2"><select class="form-select" name="role"><option value="">Все роли</option>@foreach(['student'=>'Студент','teacher'=>'Преподаватель','editor'=>'Редактор','admin'=>'Администратор'] as $k=>$v)<option value="{{ $k }}" @selected(request('role')===$k)>{{ $v }}</option>@endforeach</select></div><div class="col-md-3"><select class="form-select" name="group_id"><option value="">Все группы</option>@foreach($groups as $g)<option value="{{ $g->id }}" @selected(request('group_id')==$g->id)>{{ $g->name }}</option>@endforeach</select></div><div class="col-md-3"><button class="btn btn-dark">Фильтр</button><a class="btn btn-light" href="{{ route('admin.users.index') }}">Сбросить</a></div></div></form>
+
+<form class="card admin-card shadow-sm p-3 mb-3">
+    <div class="row g-2">
+        <div class="col-md-3"><input class="form-control" name="q" value="{{ request('q') }}" placeholder="ФИО или email"></div>
+        <div class="col-md-2"><select class="form-select" name="role"><option value="">Все роли</option>@foreach(['student'=>'Студент','teacher'=>'Преподаватель','editor'=>'Редактор','admin'=>'Администратор'] as $k=>$v)<option value="{{ $k }}" @selected(request('role')===$k)>{{ $v }}</option>@endforeach</select></div>
+        <div class="col-md-2"><select class="form-select" name="status"><option value="">Все статусы</option><option value="pending" @selected(request('status')==='pending')>Ожидают подтверждения</option><option value="approved" @selected(request('status')==='approved')>Подтверждены</option></select></div>
+        <div class="col-md-2"><select class="form-select" name="group_id"><option value="">Все группы</option>@foreach($groups as $g)<option value="{{ $g->id }}" @selected(request('group_id')==$g->id)>{{ $g->name }}</option>@endforeach</select></div>
+        <div class="col-md-3"><button class="btn btn-dark">Фильтр</button> <a class="btn btn-light" href="{{ route('admin.users.index') }}">Сбросить</a></div>
+    </div>
+</form>
+
 <form method="post" action="{{ route('admin.users.bulk-group') }}">
     @csrf
-    <div class="card admin-card shadow-sm"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th style="width:36px"><input type="checkbox" onclick="document.querySelectorAll('.user-check').forEach(x=>x.checked=this.checked)"></th><th>Пользователь</th><th>Роль</th><th>Группы</th><th></th></tr></thead><tbody>
-    @foreach($users as $u)
-        <tr><td><input class="user-check" type="checkbox" name="user_ids[]" value="{{ $u->id }}"></td><td><strong>{{ $u->name }}</strong><div class="small text-muted">{{ $u->email }}</div></td><td><span class="badge text-bg-light">{{ $u->role }}</span></td><td>{{ $u->groups->pluck('name')->join(', ') ?: '—' }}</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{{ route('admin.users.edit',$u) }}">Изменить</a></td></tr>
-    @endforeach
-    </tbody></table></div><div class="card-footer bg-white border-0 p-3"><div class="row g-2 align-items-center"><div class="col-md-4"><select class="form-select" name="group_id" required><option value="">Выберите группу</option>@foreach($groups as $g)<option value="{{ $g->id }}">{{ $g->name }}</option>@endforeach</select></div><div class="col-md-3"><select class="form-select" name="mode"><option value="add">Добавить в группу</option><option value="move">Перенести в группу</option><option value="remove">Убрать из группы</option></select></div><div class="col-md-3"><button class="btn btn-outline-dark">Применить к выбранным</button></div></div></div></div>
+    <div class="card admin-card shadow-sm">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead><tr><th style="width:36px"><input type="checkbox" onclick="document.querySelectorAll('.user-check').forEach(x=>x.checked=this.checked)"></th><th>Пользователь</th><th>Роль</th><th>Статус</th><th>Группы</th><th></th></tr></thead>
+                <tbody>
+                @foreach($users as $u)
+                    <tr class="{{ $u->approved_at ? '' : 'table-warning' }}">
+                        <td><input class="user-check" type="checkbox" name="user_ids[]" value="{{ $u->id }}"></td>
+                        <td><strong>{{ $u->name }}</strong><div class="small text-muted">{{ $u->email }}</div>@if($u->registration_requested_at)<div class="small text-muted">Заявка: {{ $u->registration_requested_at->format('d.m.Y H:i') }}</div>@endif</td>
+                        <td><span class="badge text-bg-light">{{ $u->role }}</span></td>
+                        <td>
+                            @if($u->approved_at)
+                                <span class="badge text-bg-success">Подтверждён</span>
+                            @else
+                                <span class="badge text-bg-warning">Ожидает</span>
+                            @endif
+                        </td>
+                        <td>{{ $u->groups->pluck('name')->join(', ') ?: '—' }}</td>
+                        <td class="text-end">
+                            <div class="d-inline-flex gap-1">
+                                @if(!$u->approved_at)
+                                    <button type="submit" class="btn btn-sm btn-success" formaction="{{ route('admin.users.approve',$u) }}" formmethod="post" name="_approve" value="1">Подтвердить</button>
+                                @endif
+                                <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.users.edit',$u) }}">Изменить</a>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer bg-white border-0 p-3">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-4"><select class="form-select" name="group_id" required><option value="">Выберите группу</option>@foreach($groups as $g)<option value="{{ $g->id }}">{{ $g->name }}</option>@endforeach</select></div>
+                <div class="col-md-3"><select class="form-select" name="mode"><option value="add">Добавить в группу</option><option value="move">Перенести в группу</option><option value="remove">Убрать из группы</option></select></div>
+                <div class="col-md-3"><button class="btn btn-outline-dark">Применить к выбранным</button></div>
+            </div>
+        </div>
+    </div>
 </form>
+
 <div class="mt-3">{{ $users->links() }}</div>
-<div class="card admin-card shadow-sm mt-4"><div class="card-body"><h2 class="h5">Импорт студентов из Excel / CSV</h2><p class="text-muted small">Колонки: <code>name</code> (или <code>fio</code>), <code>email</code>, необязательно <code>role</code>, <code>password</code>. Если пароль не указан — система создаст его автоматически и сохранит для администратора в зашифрованном виде.</p><form method="post" enctype="multipart/form-data" action="{{ route('admin.users.import') }}" class="row g-2">@csrf<div class="col-md-5"><input type="file" class="form-control" name="file" accept=".csv,.xlsx" required></div><div class="col-md-4"><select name="group_id" class="form-select"><option value="">Без назначения группы</option>@foreach($groups as $g)<option value="{{ $g->id }}">{{ $g->name }}</option>@endforeach</select></div><div class="col-md-3"><button class="btn btn-success w-100">Импортировать</button></div></form></div></div>
+<div class="card admin-card shadow-sm mt-4"><div class="card-body"><h2 class="h5">Импорт студентов из Excel / CSV</h2><p class="text-muted small">Колонки: <code>name</code> (или <code>fio</code>), <code>email</code>, необязательно <code>role</code>, <code>password</code>. Если пароль не указан — система создаст его автоматически и сохранит для администратора в зашифрованном виде. Импортированные администратором пользователи считаются подтверждёнными.</p><form method="post" enctype="multipart/form-data" action="{{ route('admin.users.import') }}" class="row g-2">@csrf<div class="col-md-5"><input type="file" class="form-control" name="file" accept=".csv,.xlsx" required></div><div class="col-md-4"><select name="group_id" class="form-select"><option value="">Без назначения группы</option>@foreach($groups as $g)<option value="{{ $g->id }}">{{ $g->name }}</option>@endforeach</select></div><div class="col-md-3"><button class="btn btn-success w-100">Импортировать</button></div></form></div></div>
 @endsection
