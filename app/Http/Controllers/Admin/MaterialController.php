@@ -1,0 +1,8 @@
+<?php
+namespace App\Http\Controllers\Admin;
+use App\Http\Controllers\Controller;
+use App\Models\Material;
+use App\Models\Section;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+class MaterialController extends Controller { public function index(){ $materials=Material::latest()->paginate(30); return view('admin.materials.index',compact('materials')); } public function create(){ return view('admin.materials.form',['material'=>new Material,'sections'=>Section::orderBy('title')->get(),'selected'=>[]]); } public function store(Request $r){ $m=Material::create($this->validated($r)); $m->sections()->sync($r->input('sections',[])); return redirect()->route('admin.materials.index')->with('ok','Материал создан'); } public function edit(Material $material){ return view('admin.materials.form',['material'=>$material,'sections'=>Section::orderBy('title')->get(),'selected'=>$material->sections()->pluck('sections.id')->all()]); } public function update(Request $r,Material $material){ $material->update($this->validated($r)); $material->sections()->sync($r->input('sections',[])); return redirect()->route('admin.materials.index')->with('ok','Материал обновлён'); } public function destroy(Material $material){ $material->delete(); return back()->with('ok','Материал удалён'); } private function validated(Request $r){ $data=$r->validate(['title'=>'required|max:255','slug'=>'nullable|max:255','annotation'=>'nullable','content'=>'nullable','material_type'=>'required|max:50','author'=>'nullable|max:255','media_url'=>'nullable|max:2048','status'=>'required|in:draft,published','published_at'=>'nullable|date']); $data['slug']=$data['slug']?:Str::slug($data['title']); return $data; } }

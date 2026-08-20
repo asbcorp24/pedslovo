@@ -1,0 +1,5 @@
+<?php
+namespace App\Models;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+class Section extends Model { use HasFactory; protected $fillable=['parent_id','title','slug','type','description','image','sort_order','is_active']; protected $casts=['is_active'=>'boolean']; public function parent(){ return $this->belongsTo(self::class,'parent_id'); } public function children(){ return $this->hasMany(self::class,'parent_id')->orderBy('sort_order')->orderBy('title'); } public function materials(){ return $this->belongsToMany(Material::class)->withTimestamps(); } public function scopeRoots($q){ return $q->whereNull('parent_id'); } }
