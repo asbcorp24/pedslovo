@@ -64,6 +64,7 @@
 
                 <div class="sidebar-footer mt-auto pt-4">
                     <hr class="border-light opacity-25">
+                    <a class="nav-link" href="{{ route('help') }}"><span class="menu-icon">?</span>Справка</a>
                     <a class="nav-link" href="{{ route('home') }}"><span class="menu-icon">↗</span>Открыть сайт</a>
                     <a class="nav-link" href="{{ route('cabinet') }}"><span class="menu-icon">●</span>Личный кабинет</a>
                     <form method="post" action="{{ route('logout') }}" class="mt-2">
