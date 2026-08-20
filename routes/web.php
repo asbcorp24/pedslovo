@@ -40,6 +40,8 @@ Route::get('/course/{course:slug}',[CourseController::class,'show'])->name('cour
 Route::middleware('guest')->group(function(){
     Route::get('/login',[AuthController::class,'form'])->name('login');
     Route::post('/login',[AuthController::class,'login'])->name('login.post');
+    Route::get('/register',[AuthController::class,'registerForm'])->name('register');
+    Route::post('/register',[AuthController::class,'register'])->name('register.post');
 });
 Route::post('/logout',[AuthController::class,'logout'])->middleware('auth')->name('logout');
 
@@ -81,6 +83,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(func
         Route::resource('groups',AdminGroupController::class)->except('show');
         Route::post('/groups/{group}/assign-courses',[AdminGroupController::class,'assignCourses'])->name('groups.assign-courses');
         Route::get('/users/credentials',[AdminUserController::class,'credentials'])->name('users.credentials');
+        Route::post('/users/{user}/approve',[AdminUserController::class,'approve'])->name('users.approve');
         Route::resource('users',AdminUserController::class)->except('show');
         Route::post('/users/import',[AdminUserController::class,'import'])->name('users.import');
         Route::post('/users/bulk-group',[AdminUserController::class,'bulkGroup'])->name('users.bulk-group');
