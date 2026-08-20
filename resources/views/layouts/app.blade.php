@@ -5,147 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     @php
-        $seoTitle = isset($seoPage) && $seoPage && $seoPage->title
-            ? $seoPage->title
-            : 'Педслово — ЧМУ им. Ф.П. Павлова';
+        $seoTitle = isset($seoPage) && $seoPage && $seoPage->title ? $seoPage->title : 'Педслово — ЧМУ им. Ф.П. Павлова';
         $seoDescription = isset($seoPage) && $seoPage ? $seoPage->description : null;
         $seoKeywords = isset($seoPage) && $seoPage ? $seoPage->keywords : null;
         $seoRobots = isset($seoPage) && $seoPage && $seoPage->robots ? $seoPage->robots : 'index,follow';
-        $seoCanonical = isset($seoPage) && $seoPage && $seoPage->canonical_url
-            ? $seoPage->canonical_url
-            : url()->current();
-        $seoOgTitle = isset($seoPage) && $seoPage && $seoPage->og_title
-            ? $seoPage->og_title
-            : $seoTitle;
-        $seoOgDescription = isset($seoPage) && $seoPage && $seoPage->og_description
-            ? $seoPage->og_description
-            : $seoDescription;
+        $seoCanonical = isset($seoPage) && $seoPage && $seoPage->canonical_url ? $seoPage->canonical_url : url()->current();
+        $seoOgTitle = isset($seoPage) && $seoPage && $seoPage->og_title ? $seoPage->og_title : $seoTitle;
+        $seoOgDescription = isset($seoPage) && $seoPage && $seoPage->og_description ? $seoPage->og_description : $seoDescription;
         $seoOgImage = isset($seoPage) && $seoPage ? $seoPage->og_image : null;
     @endphp
 
     <title>@yield('title', $seoTitle)</title>
-
-    @if($seoDescription)
-        <meta name="description" content="{{ $seoDescription }}">
-    @endif
-
-    @if($seoKeywords)
-        <meta name="keywords" content="{{ $seoKeywords }}">
-    @endif
-
+    @if($seoDescription)<meta name="description" content="{{ $seoDescription }}">@endif
+    @if($seoKeywords)<meta name="keywords" content="{{ $seoKeywords }}">@endif
     <meta name="robots" content="{{ $seoRobots }}">
     <link rel="canonical" href="{{ $seoCanonical }}">
-
     <meta property="og:title" content="{{ $seoOgTitle }}">
-    @if($seoOgDescription)
-        <meta property="og:description" content="{{ $seoOgDescription }}">
-    @endif
+    @if($seoOgDescription)<meta property="og:description" content="{{ $seoOgDescription }}">@endif
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    @if($seoOgImage)
-        <meta property="og:image" content="{{ $seoOgImage }}">
-    @endif
+    @if($seoOgImage)<meta property="og:image" content="{{ $seoOgImage }}">@endif
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <style>
-        :root {
-            --wine: #6f1d35;
-            --wine2: #42101f;
-            --gold: #c9a34e;
-            --paper: #f7f3ee;
-        }
-        body { background: var(--paper); color: #261d1d; }
-        .navbar-brand { font-weight: 800; }
-        .topline { background: var(--wine2); color: #eaded4; font-size: .85rem; }
-        .hero { background: linear-gradient(120deg,#5b1429,#862847); color:#fff; border-radius:28px; overflow:hidden; position:relative; }
-        .hero:after { content:'♫'; position:absolute; right:4%; top:-15%; font-size:240px; color:rgba(255,255,255,.06); }
-        .section-card,.content-card { border:0; border-radius:20px; transition:.2s; }
-        .section-card:hover,.content-card:hover { transform:translateY(-4px); box-shadow:0 15px 35px rgba(57,24,24,.12); }
-        .gold { color:var(--gold); }
-        .btn-wine { background:var(--wine); color:#fff; border-color:var(--wine); }
-        .btn-wine:hover { background:var(--wine2); color:#fff; }
-        .year-pill { border:1px solid #ead7c2; border-radius:999px; padding:.35rem .7rem; background:#fff; }
-        .footer { background:#27161c; color:#d8c8c1; }
+        :root{--wine:#6f1d35;--wine2:#42101f;--gold:#c9a34e;--paper:#f7f3ee}body{background:var(--paper);color:#261d1d}.navbar-brand{font-weight:800;letter-spacing:.02em}.topline{background:var(--wine2);color:#eaded4;font-size:.85rem}.hero{background:linear-gradient(120deg,#5b1429,#862847);color:#fff;border-radius:28px;overflow:hidden;position:relative}.hero:after{content:'♫';position:absolute;right:4%;top:-15%;font-size:240px;color:rgba(255,255,255,.06)}.section-card,.content-card{border:0;border-radius:20px;transition:.2s}.section-card:hover,.content-card:hover{transform:translateY(-4px);box-shadow:0 15px 35px rgba(57,24,24,.12)}.gold{color:var(--gold)}.btn-wine{background:var(--wine);color:#fff;border-color:var(--wine)}.btn-wine:hover{background:var(--wine2);color:#fff}.year-pill{border:1px solid #ead7c2;border-radius:999px;padding:.35rem .7rem;background:#fff}.footer{background:#27161c;color:#d8c8c1}.main-nav .nav-link{font-weight:600;color:#49383d;border-radius:.6rem;padding:.5rem .7rem}.main-nav .nav-link:hover,.main-nav .nav-link.active{background:#f5ecef;color:var(--wine)}.user-chip{max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}@media(max-width:991.98px){.navbar-collapse{padding:1rem 0}.navbar-actions{border-top:1px solid #eee;padding-top:1rem;margin-top:.6rem}.topline .container{gap:.5rem;font-size:.76rem}}
     </style>
 </head>
 <body>
-    @php
-        $college = \App\Models\SiteSetting::value('college_short_name', 'ЧМУ им. Ф.П. Павлова');
-        $collegeSite = \App\Models\SiteSetting::value('college_site', 'https://xn--g1ajvbu.xn--p1ai/');
-        $notice = \App\Models\SiteSetting::value('maintenance_notice');
-        $footerText = \App\Models\SiteSetting::value(
-            'footer_text',
-            'Образовательный ресурс Чебоксарского музыкального училища имени Ф.П. Павлова'
-        );
-        $contactPhone = \App\Models\SiteSetting::value('contact_phone');
-        $contactEmail = \App\Models\SiteSetting::value('contact_email');
-        $analyticsCode = \App\Models\SiteSetting::value('analytics_code', '');
-    @endphp
+@php
+    $college = \App\Models\SiteSetting::value('college_short_name', 'ЧМУ им. Ф.П. Павлова');
+    $collegeSite = \App\Models\SiteSetting::value('college_site', 'https://xn--g1ajvbu.xn--p1ai/');
+    $notice = \App\Models\SiteSetting::value('maintenance_notice');
+    $footerText = \App\Models\SiteSetting::value('footer_text','Образовательный ресурс Чебоксарского музыкального училища имени Ф.П. Павлова');
+    $contactPhone = \App\Models\SiteSetting::value('contact_phone');
+    $contactEmail = \App\Models\SiteSetting::value('contact_email');
+    $analyticsCode = \App\Models\SiteSetting::value('analytics_code', '');
+@endphp
 
-    <div class="topline py-2">
-        <div class="container d-flex justify-content-between">
-            <span>Учебная часть {{ $college }}</span>
-            <a class="text-white-50 text-decoration-none" href="{{ $collegeSite }}" target="_blank" rel="noopener">
-                Официальный сайт училища ↗
-            </a>
-        </div>
+<div class="topline py-2">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center">
+        <span>Учебная часть {{ $college }}</span>
+        <a class="text-white-50 text-decoration-none" href="{{ $collegeSite }}" target="_blank" rel="noopener">Официальный сайт училища ↗</a>
     </div>
+</div>
 
-    <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <span class="gold">♪</span> ПЕДСЛОВО
-            </a>
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm">
+    <div class="container">
+        <a class="navbar-brand me-4" href="{{ route('home') }}"><span class="gold">♪</span> ПЕДСЛОВО</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Открыть меню"><span class="navbar-toggler-icon"></span></button>
 
-            <div class="ms-auto d-flex gap-2 align-items-center">
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav main-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Главная</a></li>
                 @auth
-                    <a href="{{ route('cabinet') }}" class="btn btn-light btn-sm">Личный кабинет</a>
-
-                    @if(auth()->user()->canEditContent())
-                        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-dark btn-sm">Админ-панель</a>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('learning.my-courses') || request()->routeIs('learning.lesson') ? 'active' : '' }}" href="{{ route('learning.my-courses') }}">Мои курсы</a></li>
+                    @if(Route::has('certificates.index'))
+                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('certificates.*') ? 'active' : '' }}" href="{{ route('certificates.index') }}">Сертификаты</a></li>
                     @endif
+                @endauth
+            </ul>
 
-                    <form class="d-inline" method="post" action="{{ route('logout') }}">
-                        @csrf
-                        <button class="btn btn-wine btn-sm" type="submit">Выйти</button>
-                    </form>
+            <div class="navbar-actions d-flex flex-wrap gap-2 align-items-center">
+                @auth
+                    <span class="small text-muted user-chip" title="{{ auth()->user()->name }}">{{ auth()->user()->name }}</span>
+                    <a href="{{ route('cabinet') }}" class="btn btn-light btn-sm">Личный кабинет</a>
+                    @if(auth()->user()->canEditContent())
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-dark btn-sm">Управление</a>
+                    @endif
+                    <form class="d-inline" method="post" action="{{ route('logout') }}">@csrf<button class="btn btn-wine btn-sm" type="submit">Выйти</button></form>
                 @else
                     <a class="btn btn-wine btn-sm" href="{{ route('login') }}">Войти</a>
                 @endauth
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    @if($notice)
-        <div class="alert alert-warning rounded-0 mb-0 text-center">
-            {{ $notice }}
-        </div>
-    @endif
+@if($notice)<div class="alert alert-warning rounded-0 mb-0 text-center">{{ $notice }}</div>@endif
+<main>@yield('content')</main>
 
-    <main>
-        @yield('content')
-    </main>
+<footer class="footer py-5 mt-5">
+    <div class="container"><div class="row"><div class="col-lg-7"><div class="h5">ПЕДСЛОВО</div><p class="mb-0 text-white-50">{{ $footerText }}</p></div><div class="col-lg-5 text-lg-end mt-3 mt-lg-0">@if($contactPhone)<div>{{ $contactPhone }}</div>@endif @if($contactEmail)<div>{{ $contactEmail }}</div>@endif</div></div></div>
+</footer>
 
-    <footer class="footer py-5 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-7">
-                    <div class="h5">ПЕДСЛОВО</div>
-                    <p class="mb-0 text-white-50">{{ $footerText }}</p>
-                </div>
-                <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
-                    @if($contactPhone)
-                        <div>{{ $contactPhone }}</div>
-                    @endif
-                    @if($contactEmail)
-                        <div>{{ $contactEmail }}</div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    {!! $analyticsCode !!}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{!! $analyticsCode !!}
 </body>
 </html>
