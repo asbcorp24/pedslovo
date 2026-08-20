@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function(){
 
 Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(function(){
     Route::get('/',[DashboardController::class,'index'])->name('dashboard');
+    Route::post('/sections/{section}/assign-course',[AdminSectionController::class,'assignCourse'])->name('sections.assign-course');
     Route::resource('sections',AdminSectionController::class)->except('show');
     Route::resource('materials',AdminMaterialController::class)->except('show');
     Route::resource('courses',AdminCourseController::class)->except('show');
