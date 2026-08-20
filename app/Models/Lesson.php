@@ -31,4 +31,5 @@ class Lesson extends Model
     public function progress(){ return $this->hasMany(LessonProgress::class); }
     public function files(){ return $this->hasMany(LessonFile::class)->orderByDesc('is_primary')->orderBy('id'); }
     public function primaryFile(){ return $this->hasOne(LessonFile::class)->where('is_primary',true); }
+    public function links(){ return $this->hasMany(LessonLink::class)->orderBy('sort_order')->orderBy('id'); }
 }
