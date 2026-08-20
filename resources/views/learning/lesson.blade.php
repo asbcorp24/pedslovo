@@ -12,7 +12,9 @@
             @if($lesson->description)<p class="lead text-muted">{{ $lesson->description }}</p>@endif
 
             @if($lesson->material)
-                @php($materialState=$resourceProgress->get('material:'.$lesson->material_id))
+                @php
+                    $materialState = $resourceProgress->get('material:'.$lesson->material_id);
+                @endphp
                 <div class="card border-0 shadow-sm mb-3"><div class="card-body p-4">
                     <div class="d-flex justify-content-between gap-2 align-items-start">
                         <div><div class="small text-muted mb-1">{{ __('Материал портала') }}</div><h4>{{ $lesson->material->title }}</h4></div>
@@ -33,7 +35,9 @@
             @if($lesson->links->count())
                 <h2 class="h4 mt-4">{{ __('Видео урока') }}</h2>
                 @foreach($lesson->links as $link)
-                    @php($linkState=$resourceProgress->get('link:'.$link->id))
+                    @php
+                        $linkState = $resourceProgress->get('link:'.$link->id);
+                    @endphp
                     <div class="card border-0 shadow-sm mb-3"><div class="card-body p-3">
                         <div class="d-flex justify-content-between align-items-center mb-2 gap-2">
                             <div><strong>{{ $link->title ?: __('Видео') }}</strong> <span class="badge text-bg-light">{{ $link->provider }}</span> <span class="badge {{ $link->is_required ? 'text-bg-warning' : 'text-bg-light' }}">{{ $link->is_required ? __('ui.required') : __('ui.optional') }}</span></div>
@@ -55,7 +59,9 @@
                 <h2 class="h4 mt-4">{{ __('Интерактивные задания и тесты') }}</h2>
                 <div class="row g-3 mb-4">
                     @foreach($lesson->scormPackages as $package)
-                        @php($scormState=$resourceProgress->get('scorm:'.$package->id))
+                        @php
+                            $scormState = $resourceProgress->get('scorm:'.$package->id);
+                        @endphp
                         <div class="col-md-6"><div class="card border-success-subtle shadow-sm h-100"><div class="card-body p-4">
                             <div class="d-flex justify-content-between gap-2"><div class="small text-success mb-1">SCORM {{ $package->version }}</div><span class="badge {{ $package->pivot->is_required ? 'text-bg-warning' : 'text-bg-light' }}">{{ $package->pivot->is_required ? __('ui.required') : __('ui.optional') }}</span></div>
                             <h3 class="h5">{{ $package->title }}</h3>
@@ -71,9 +77,9 @@
             @if($lesson->files->count())<h2 class="h4 mt-4">{{ __('Материалы урока') }}</h2>@endif
             @foreach($lesson->files as $file)
                 @php
-                    $ext=strtolower(pathinfo($file->original_name,PATHINFO_EXTENSION));
-                    $openUrl=$file->launch_url ?: $file->url;
-                    $fileState=$resourceProgress->get('file:'.$file->id);
+                    $ext = strtolower(pathinfo($file->original_name, PATHINFO_EXTENSION));
+                    $openUrl = $file->launch_url ?: $file->url;
+                    $fileState = $resourceProgress->get('file:'.$file->id);
                 @endphp
                 <div class="card border-0 shadow-sm mb-3"><div class="card-body p-3">
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
