@@ -7,6 +7,7 @@ use App\Models\LessonProgress;
 use App\Models\ScormAttempt;
 use App\Models\ScormPackage;
 use App\Services\CourseCompletionService;
+use App\Services\LessonCompletionService;
 use Illuminate\Http\Request;
 
 class ScormPlayerController extends Controller
@@ -61,7 +62,7 @@ class ScormPlayerController extends Controller
         ]);
     }
 
-    public function commit(Request $request, ScormAttempt $attempt, CourseCompletionService $completion)
+    public function commit(Request $request, ScormAttempt $attempt, LessonCompletionService $lessonCompletion, CourseCompletionService $courseCompletion)
     {
         $this->authorizeAttempt($attempt);
         $data = $request->validate(['data'=>'required|array']);
@@ -87,23 +88,22 @@ class ScormPlayerController extends Controller
             'lesson_location'=>isset($cmi['cmi.core.lesson_location']) ? $cmi['cmi.core.lesson_location'] : (isset($cmi['cmi.location']) ? $cmi['cmi.location'] : $attempt->lesson_location),
             'suspend_data'=>isset($cmi['cmi.suspend_data']) ? $cmi['cmi.suspend_data'] : $attempt->suspend_data,
             'session_time'=>isset($cmi['cmi.core.session_time']) ? $cmi['cmi.core.session_time'] : (isset($cmi['cmi.session_time']) ? $cmi['cmi.session_time'] : $attempt->session_time),
-            'completed_at'=>in_array($status,['completed','passed','failed']) ? now() : $attempt->completed_at
+            'completed_at'=>in_array($status,['completed','passed','failed'],true) ? now() : $attempt->completed_at
         ]);
 
         if ($attempt->lesson_id) {
-            $progress = LessonProgress::firstOrCreate(
-                ['lesson_id'=>$attempt->lesson_id,'user_id'=>$attempt->user_id],
-                ['started_at'=>$attempt->started_at]
-            );
-            $mapped = in_array($status,['completed','passed']) ? $status : ($status === 'failed' ? 'failed' : 'in_progress');
-            $progress->update([
-                'status'=>$mapped,
-                'score'=>is_numeric($score) ? $score : $progress->score,
-                'started_at'=>$progress->started_at ?: $attempt->started_at,
-                'completed_at'=>in_array($mapped,['completed','passed']) ? now() : $progress->completed_at
-            ]);
             $lesson = Lesson::find($attempt->lesson_id);
-            if ($lesson) $completion->refresh($lesson->course_id,$attempt->user_id);
+            if ($lesson) {
+                $progress = LessonProgress::firstOrCreate(
+                    ['lesson_id'=>$lesson->id,'user_id'=>$attempt->user_id],
+                    ['status'=>'in_progress','started_at'=>$attempt->started_at]
+                );
+                if (is_numeric($score)) {
+                    $progress->update(['score'=>$score,'started_at'=>$progress->started_at ?: $attempt->started_at]);
+                }
+                $lessonCompletion->refresh($lesson,$attempt->user_id);
+                $courseCompletion->refresh($lesson->course_id,$attempt->user_id);
+            }
         }
 
         return response()->json(['ok'=>true]);
