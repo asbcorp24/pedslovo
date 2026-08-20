@@ -82,6 +82,7 @@
                 @auth
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('learning.my-courses') || request()->routeIs('learning.lesson') ? 'active' : '' }}" href="{{ route('learning.my-courses') }}">{{ __('ui.my_courses') }}</a></li>
                     @if(Route::has('certificates.index'))<li class="nav-item"><a class="nav-link {{ request()->routeIs('certificates.*') ? 'active' : '' }}" href="{{ route('certificates.index') }}">{{ __('ui.certificates') }}</a></li>@endif
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('help') ? 'active' : '' }}" href="{{ route('help') }}">{{ __('ui.help') }}</a></li>
                 @endauth
             </ul>
             <div class="navbar-actions d-flex flex-wrap gap-2 align-items-center">
