@@ -88,4 +88,94 @@
 
     <button class="btn btn-dark btn-lg">Сохранить</button>
 </form>
+
+@if($section->exists)
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div>
+                    <h2 class="h5 mb-1">Связи с обучением</h2>
+                    <div class="text-muted small">Цепочка: раздел / специальность → учебный курс → уроки.</div>
+                </div>
+                <a class="btn btn-outline-primary" href="{{ route('admin.courses.create',['section_id'=>$section->id]) }}">+ Добавить курс в этот раздел</a>
+            </div>
+
+            @if($section->courses->count())
+                <h3 class="h6 mt-4">Курсы, привязанные непосредственно к этому разделу</h3>
+                <div class="list-group mb-4">
+                    @foreach($section->courses as $course)
+                        <div class="list-group-item">
+                            <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center">
+                                <div>
+                                    <strong>{{ $course->title }}</strong>
+                                    <div class="small text-muted">{{ $course->study_year ? $course->study_year.' курс' : 'Курс не указан' }} · уроков: {{ $course->lessons->count() }}</div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a class="btn btn-sm btn-outline-success" href="{{ route('admin.courses.lessons.index',$course) }}">Уроки</a>
+                                    <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.courses.edit',$course) }}">Курс</a>
+                                </div>
+                            </div>
+                            @if($course->lessons->count())
+                                <div class="mt-2 small">
+                                    @foreach($course->lessons as $lesson)
+                                        <span class="badge text-bg-light border me-1 mb-1">{{ $lesson->title }}</span>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            @if($section->children->count())
+                <h3 class="h6 mt-4">Дочерние разделы / специальности</h3>
+                <div class="accordion" id="sectionChildrenAccordion">
+                    @foreach($section->children as $child)
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#child-{{ $child->id }}">
+                                    {{ $child->localizedTitle('ru') }}
+                                    <span class="badge text-bg-light ms-2">курсов: {{ $child->courses->count() }}</span>
+                                </button>
+                            </h2>
+                            <div id="child-{{ $child->id }}" class="accordion-collapse collapse" data-bs-parent="#sectionChildrenAccordion">
+                                <div class="accordion-body">
+                                    <div class="d-flex justify-content-end mb-2">
+                                        <a class="btn btn-sm btn-outline-secondary me-2" href="{{ route('admin.sections.edit',$child) }}">Редактировать раздел</a>
+                                        <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.courses.create',['section_id'=>$child->id]) }}">+ Добавить курс</a>
+                                    </div>
+                                    @forelse($child->courses as $course)
+                                        <div class="border rounded p-3 mb-2">
+                                            <div class="d-flex flex-wrap justify-content-between gap-2">
+                                                <div>
+                                                    <strong>{{ $course->title }}</strong>
+                                                    <div class="small text-muted">{{ $course->study_year ? $course->study_year.' курс' : 'Курс не указан' }} · уроков: {{ $course->lessons->count() }}</div>
+                                                </div>
+                                                <div class="d-flex gap-2">
+                                                    <a class="btn btn-sm btn-outline-success" href="{{ route('admin.courses.lessons.index',$course) }}">Уроки</a>
+                                                    <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.courses.edit',$course) }}">Курс</a>
+                                                </div>
+                                            </div>
+                                            @if($course->lessons->count())
+                                                <div class="mt-2 small">
+                                                    @foreach($course->lessons as $lesson)
+                                                        <span class="badge text-bg-light border me-1 mb-1">{{ $lesson->title }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @empty
+                                        <div class="text-muted">К этому разделу пока не привязано ни одного учебного курса.</div>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @elseif(!$section->courses->count())
+                <div class="alert alert-light border mb-0">К этому разделу пока не привязаны курсы и нет дочерних разделов. Добавьте курс кнопкой выше либо назначьте этот раздел в поле «Раздел / специальность» у существующего курса.</div>
+            @endif
+        </div>
+    </div>
+@endif
 @endsection
