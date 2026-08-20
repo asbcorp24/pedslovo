@@ -23,12 +23,15 @@ class UserController extends Controller
             });
         }
         if ($request->filled('role')) $q->where('role',$request->role);
+        if ($request->status === 'pending') $q->whereNull('approved_at');
+        if ($request->status === 'approved') $q->whereNotNull('approved_at');
         if ($request->filled('group_id')) $q->whereHas('groups',function($x) use ($request) {
             $x->where('groups.id',$request->group_id);
         });
         return view('admin.users.index',[
-            'users'=>$q->orderBy('name')->paginate(40)->withQueryString(),
-            'groups'=>Group::orderBy('name')->get()
+            'users'=>$q->orderByRaw('approved_at IS NULL DESC')->orderBy('name')->paginate(40)->withQueryString(),
+            'groups'=>Group::orderBy('name')->get(),
+            'pendingCount'=>User::whereNull('approved_at')->count(),
         ]);
     }
 
@@ -40,9 +43,18 @@ class UserController extends Controller
         $plain = $request->input('password') ?: Str::random(12);
         $data['password'] = Hash::make($plain);
         $data['student_password_secret'] = $data['role']==='student' ? $cipher->encrypt($plain) : null;
+        $data['approved_at'] = now();
         $user = User::create($data);
         $user->groups()->sync($request->input('group_ids',[]));
         return redirect()->route('admin.users.edit',$user)->with('success','Пользователь создан. Пароль сохранён в зашифрованном виде.');
+    }
+
+    public function approve(User $user)
+    {
+        if (!$user->approved_at) {
+            $user->update(['approved_at'=>now()]);
+        }
+        return back()->with('success','Регистрация пользователя подтверждена. Теперь он может войти в систему.');
     }
 
     public function edit(User $user, StudentCredentialCipher $cipher)
@@ -134,7 +146,7 @@ class UserController extends Controller
             $role=in_array(($row['role']??'student'),['student','teacher','editor','admin'],true)?$row['role']:'student';
             $plain=(string)($row['password']??'');
             if($plain==='') $plain=Str::random(12);
-            $values=['name'=>$name,'role'=>$role,'password'=>Hash::make($plain),'student_password_secret'=>$role==='student'?$cipher->encrypt($plain):null];
+            $values=['name'=>$name,'role'=>$role,'password'=>Hash::make($plain),'student_password_secret'=>$role==='student'?$cipher->encrypt($plain):null,'approved_at'=>now()];
             $user=User::updateOrCreate(['email'=>$email],$values);
             if($request->group_id) $user->groups()->syncWithoutDetaching([$request->group_id]);
             $count++;
