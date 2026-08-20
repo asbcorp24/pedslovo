@@ -41,7 +41,12 @@ class SectionController extends Controller
 
     public function edit(Section $section)
     {
-        $section->load('translations');
+        $section->load([
+            'translations',
+            'courses.lessons',
+            'children.translations',
+            'children.courses.lessons',
+        ]);
 
         return view('admin.sections.form', [
             'section' => $section,
