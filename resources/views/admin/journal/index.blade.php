@@ -1,1 +1,20 @@
-@extends('admin.layout') @section('title','Журнал') @section('content')<div class="small-label">Контроль обучения</div><h1 class="mb-4">Электронный журнал</h1><form class="card admin-card shadow-sm p-3 mb-3"><div class="row g-2"><div class="col-md-4"><select name="instructor_id" class="form-select"><option value="">Все преподаватели</option>@foreach($teachers as $t)<option value="{{ $t->id }}" @selected(request('instructor_id')==$t->id)>{{ $t->name }}</option>@endforeach</select></div><div class="col-md-3"><select name="study_year" class="form-select"><option value="">Все курсы обучения</option>@for($i=1;$i<=4;$i++)<option value="{{ $i }}" @selected(request('study_year')==$i)>{{ $i }} курс</option>@endfor</select></div><div class="col-md-3"><button class="btn btn-dark">Показать</button></div></div></form><div class="card admin-card shadow-sm"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Дисциплина</th><th>Специальность</th><th>Курс</th><th>Студентов</th><th></th></tr></thead><tbody>@foreach($courses as $c)<tr><td><strong>{{ $c->title }}</strong></td><td>{{ $c->section?->title }}</td><td>{{ $c->study_year ?: '—' }}</td><td>{{ $c->enrollments_count }}</td><td class="text-end"><a class="btn btn-sm btn-primary" href="{{ route('admin.journal.show',$c) }}">Открыть журнал</a></td></tr>@endforeach</tbody></table></div></div>@endsection
+@extends('admin.layout')
+
+@section('title','Журнал')
+
+@section('content')
+<div class="small-label">Контроль обучения</div>
+<h1 class="mb-4">Электронный журнал</h1>
+<form class="card admin-card shadow-sm p-3 mb-3">
+    <div class="row g-2">
+        <div class="col-md-4"><select name="instructor_id" class="form-select"><option value="">Все преподаватели</option>@foreach($teachers as $t)<option value="{{ $t->id }}" @selected(request('instructor_id')==$t->id)>{{ $t->name }}</option>@endforeach</select></div>
+        <div class="col-md-3"><select name="study_year" class="form-select"><option value="">Все курсы обучения</option>@for($i=1;$i<=4;$i++)<option value="{{ $i }}" @selected(request('study_year')==$i)>{{ $i }} курс</option>@endfor</select></div>
+        <div class="col-md-3"><button class="btn btn-dark">Показать</button></div>
+    </div>
+</form>
+<div class="card admin-card shadow-sm"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Дисциплина</th><th>Специальность</th><th>Курс</th><th>Студентов</th><th></th></tr></thead><tbody>
+@foreach($courses as $c)
+<tr><td><strong>{{ $c->title }}</strong></td><td>{{ optional($c->section)->title }}</td><td>{{ $c->study_year ?: '—' }}</td><td>{{ $c->enrollments_count }}</td><td class="text-end"><a class="btn btn-sm btn-primary" href="{{ route('admin.journal.show',$c) }}">Открыть журнал</a></td></tr>
+@endforeach
+</tbody></table></div></div>
+@endsection

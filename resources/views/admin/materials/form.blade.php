@@ -1,1 +1,23 @@
-@extends('admin.layout') @section('title',$material->exists?'Изменить материал':'Новый материал') @section('content')<h1 class="mb-4">{{ $material->exists?'Изменить материал':'Новый материал' }}</h1><form method="post" action="{{ $material->exists?route('admin.materials.update',$material):route('admin.materials.store') }}">@csrf @if($material->exists)@method('PUT')@endif<div class="card border-0 shadow-sm"><div class="card-body p-4"><div class="mb-3"><label class="form-label">Название</label><input class="form-control" name="title" value="{{ old('title',$material->title) }}" required></div><div class="row"><div class="col-md-6 mb-3"><label class="form-label">Тип</label><select class="form-select" name="material_type">@foreach(['article'=>'Статья','video'=>'Видео','audio'=>'Аудио','pdf'=>'PDF','notes'=>'Ноты','lecture'=>'Лекция','manual'=>'Методическое пособие'] as $k=>$v)<option value="{{ $k }}" @selected(old('material_type',$material->material_type)==$k)>{{ $v }}</option>@endforeach</select></div><div class="col-md-6 mb-3"><label class="form-label">Статус</label><select class="form-select" name="status"><option value="draft" @selected(old('status',$material->status)=='draft')>Черновик</option><option value="published" @selected(old('status',$material->status)=='published')>Опубликован</option></select></div></div><div class="mb-3"><label class="form-label">Автор</label><input class="form-control" name="author" value="{{ old('author',$material->author) }}"></div><div class="mb-3"><label class="form-label">Аннотация</label><textarea class="form-control" name="annotation" rows="3">{{ old('annotation',$material->annotation) }}</textarea></div><div class="mb-3"><label class="form-label">Содержимое (HTML)</label><textarea class="form-control font-monospace" name="content" rows="12">{{ old('content',$material->content) }}</textarea></div><div class="mb-3"><label class="form-label">URL медиа</label><input class="form-control" name="media_url" value="{{ old('media_url',$material->media_url) }}"></div><div class="mb-3"><label class="form-label">Разделы</label><select class="form-select" name="sections[]" multiple size="10">@foreach($sections as $s)<option value="{{ $s->id }}" @selected(in_array($s->id,old('sections',$selected)))>{{ $s->title }}</option>@endforeach</select></div><button class="btn btn-dark">Сохранить</button></div></div></form>@endsection
+@extends('admin.layout')
+
+@section('title',$material->exists ? 'Изменить материал' : 'Новый материал')
+
+@section('content')
+<h1 class="mb-4">{{ $material->exists ? 'Изменить материал' : 'Новый материал' }}</h1>
+<form method="post" action="{{ $material->exists ? route('admin.materials.update',$material) : route('admin.materials.store') }}">
+    @csrf
+    @if($material->exists)
+        @method('PUT')
+    @endif
+    <div class="card border-0 shadow-sm"><div class="card-body p-4">
+        <div class="mb-3"><label class="form-label">Название</label><input class="form-control" name="title" value="{{ old('title',$material->title) }}" required></div>
+        <div class="row"><div class="col-md-6 mb-3"><label class="form-label">Тип</label><select class="form-select" name="material_type">@foreach(['article'=>'Статья','video'=>'Видео','audio'=>'Аудио','pdf'=>'PDF','notes'=>'Ноты','lecture'=>'Лекция','manual'=>'Методическое пособие'] as $k=>$v)<option value="{{ $k }}" @selected(old('material_type',$material->material_type)==$k)>{{ $v }}</option>@endforeach</select></div><div class="col-md-6 mb-3"><label class="form-label">Статус</label><select class="form-select" name="status"><option value="draft" @selected(old('status',$material->status)=='draft')>Черновик</option><option value="published" @selected(old('status',$material->status)=='published')>Опубликован</option></select></div></div>
+        <div class="mb-3"><label class="form-label">Автор</label><input class="form-control" name="author" value="{{ old('author',$material->author) }}"></div>
+        <div class="mb-3"><label class="form-label">Аннотация</label><textarea class="form-control" name="annotation" rows="3">{{ old('annotation',$material->annotation) }}</textarea></div>
+        <div class="mb-3"><label class="form-label">Содержимое (HTML)</label><textarea class="form-control font-monospace" name="content" rows="12">{{ old('content',$material->content) }}</textarea></div>
+        <div class="mb-3"><label class="form-label">URL медиа</label><input class="form-control" name="media_url" value="{{ old('media_url',$material->media_url) }}"></div>
+        <div class="mb-3"><label class="form-label">Разделы</label><select class="form-select" name="sections[]" multiple size="10">@foreach($sections as $s)<option value="{{ $s->id }}" @selected(in_array($s->id,old('sections',$selected)))>{{ $s->title }}</option>@endforeach</select></div>
+        <button class="btn btn-dark">Сохранить</button>
+    </div></div>
+</form>
+@endsection

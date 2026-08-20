@@ -1,1 +1,25 @@
-@extends('admin.layout') @section('title',$group->exists?'Группа '.$group->name:'Новая группа') @section('content')<a href="{{ route('admin.groups.index') }}" class="text-decoration-none">← Группы</a><h1 class="mt-2">{{ $group->exists?'Учебная группа '.$group->name:'Новая учебная группа' }}</h1><form method="post" action="{{ $group->exists?route('admin.groups.update',$group):route('admin.groups.store') }}" class="card admin-card shadow-sm mt-3"><div class="card-body p-4">@csrf @if($group->exists)@method('PUT')@endif<div class="row g-3"><div class="col-md-5"><label class="form-label">Название</label><input name="name" value="{{ old('name',$group->name) }}" class="form-control" required></div><div class="col-md-3"><label class="form-label">Код</label><input name="code" value="{{ old('code',$group->code) }}" class="form-control"></div><div class="col-md-4"><label class="form-label">Куратор</label><select name="curator_id" class="form-select"><option value="">—</option>@foreach($curators as $u)<option value="{{ $u->id }}" @selected(old('curator_id',$group->curator_id)==$u->id)>{{ $u->name }}</option>@endforeach</select></div><div class="col-12"><hr><h2 class="h5">Студенты группы</h2><div class="row g-2" style="max-height:320px;overflow:auto">@foreach($users as $u)<div class="col-md-4"><label class="border rounded p-2 d-block"><input type="checkbox" name="user_ids[]" value="{{ $u->id }}" @checked(in_array($u->id,old('user_ids',$group->exists?$group->users()->pluck('users.id')->all():[])))> {{ $u->name }}<small class="d-block text-muted">{{ $u->email }}</small></label></div>@endforeach</div></div><div class="col-12"><hr><h2 class="h5">Дисциплины / курсы группы</h2><div class="row g-2" style="max-height:320px;overflow:auto">@foreach($courses as $c)<div class="col-md-4"><label class="border rounded p-2 d-block"><input type="checkbox" name="course_ids[]" value="{{ $c->id }}" @checked(in_array($c->id,old('course_ids',$group->exists?$group->courses()->pluck('courses.id')->all():[])))> {{ $c->title }} <small class="text-muted">{{ $c->study_year ? $c->study_year.' курс':'' }}</small></label></div>@endforeach</div></div><div class="col-12 form-check ms-1"><input type="checkbox" name="is_active" value="1" class="form-check-input" @checked(old('is_active',$group->exists?$group->is_active:true))><label class="form-check-label">Активна</label></div></div></div><div class="card-footer bg-white border-0 p-4 pt-0"><button class="btn btn-primary">Сохранить группу и назначения</button></div></form>@endsection
+@extends('admin.layout')
+
+@section('title',$group->exists ? 'Группа '.$group->name : 'Новая группа')
+
+@section('content')
+<a href="{{ route('admin.groups.index') }}" class="text-decoration-none">← Группы</a>
+<h1 class="mt-2">{{ $group->exists ? 'Учебная группа '.$group->name : 'Новая учебная группа' }}</h1>
+<form method="post" action="{{ $group->exists ? route('admin.groups.update',$group) : route('admin.groups.store') }}" class="card admin-card shadow-sm mt-3">
+    <div class="card-body p-4">
+        @csrf
+        @if($group->exists)
+            @method('PUT')
+        @endif
+        <div class="row g-3">
+            <div class="col-md-5"><label class="form-label">Название</label><input name="name" value="{{ old('name',$group->name) }}" class="form-control" required></div>
+            <div class="col-md-3"><label class="form-label">Код</label><input name="code" value="{{ old('code',$group->code) }}" class="form-control"></div>
+            <div class="col-md-4"><label class="form-label">Куратор</label><select name="curator_id" class="form-select"><option value="">—</option>@foreach($curators as $u)<option value="{{ $u->id }}" @selected(old('curator_id',$group->curator_id)==$u->id)>{{ $u->name }}</option>@endforeach</select></div>
+            <div class="col-12"><hr><h2 class="h5">Студенты группы</h2><div class="row g-2" style="max-height:320px;overflow:auto">@foreach($users as $u)<div class="col-md-4"><label class="border rounded p-2 d-block"><input type="checkbox" name="user_ids[]" value="{{ $u->id }}" @checked(in_array($u->id,old('user_ids',$group->exists ? $group->users()->pluck('users.id')->all() : [])))> {{ $u->name }}<small class="d-block text-muted">{{ $u->email }}</small></label></div>@endforeach</div></div>
+            <div class="col-12"><hr><h2 class="h5">Дисциплины / курсы группы</h2><div class="row g-2" style="max-height:320px;overflow:auto">@foreach($courses as $c)<div class="col-md-4"><label class="border rounded p-2 d-block"><input type="checkbox" name="course_ids[]" value="{{ $c->id }}" @checked(in_array($c->id,old('course_ids',$group->exists ? $group->courses()->pluck('courses.id')->all() : [])))> {{ $c->title }} <small class="text-muted">{{ $c->study_year ? $c->study_year.' курс' : '' }}</small></label></div>@endforeach</div></div>
+            <div class="col-12 form-check ms-1"><input type="checkbox" name="is_active" value="1" class="form-check-input" @checked(old('is_active',$group->exists ? $group->is_active : true))><label class="form-check-label">Активна</label></div>
+        </div>
+    </div>
+    <div class="card-footer bg-white border-0 p-4 pt-0"><button class="btn btn-primary">Сохранить группу и назначения</button></div>
+</form>
+@endsection

@@ -1,1 +1,39 @@
-@extends('admin.layout') @section('title','Учебные курсы') @section('content')<div class="d-flex justify-content-between align-items-center"><div><div class="small-label">Учебный контент</div><h1>Учебные курсы</h1></div><a href="{{ route('admin.courses.create') }}" class="btn btn-primary">Добавить курс</a></div><div class="alert alert-light border mt-3">Перетаскивайте строки ↕ для изменения порядка.</div><div class="card admin-card shadow-sm"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th></th><th>Название</th><th>Раздел</th><th>Преподаватель</th><th>Курс</th><th></th></tr></thead><tbody class="js-sortable" data-sort-url="{{ route('admin.sort.update','courses') }}">@foreach($courses as $course)<tr data-sort-id="{{ $course->id }}"><td class="drag-handle">↕</td><td><strong>{{ $course->title }}</strong></td><td>{{ optional($course->section)->title }}</td><td>{{ optional($course->instructor)->name ?: '—' }}</td><td>{{ $course->study_year ? $course->study_year.' курс' : '—' }}</td><td class="text-end"><a href="{{ route('admin.courses.lessons.index',$course) }}" class="btn btn-sm btn-outline-success">Уроки</a><a href="{{ route('admin.courses.edit',$course) }}" class="btn btn-sm btn-outline-primary">Изменить</a><form class="d-inline" method="post" action="{{ route('admin.courses.destroy',$course) }}">@csrf @method('DELETE')<button class="btn btn-sm btn-outline-danger">Удалить</button></form></td></tr>@endforeach</tbody></table></div></div><div class="mt-3">{{ $courses->links() }}</div>@endsection
+@extends('admin.layout')
+
+@section('title','Учебные курсы')
+
+@section('content')
+<div class="d-flex justify-content-between align-items-center">
+    <div><div class="small-label">Учебный контент</div><h1>Учебные курсы</h1></div>
+    <a href="{{ route('admin.courses.create') }}" class="btn btn-primary">Добавить курс</a>
+</div>
+<div class="alert alert-light border mt-3">Перетаскивайте строки ↕ для изменения порядка.</div>
+<div class="card admin-card shadow-sm">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead><tr><th></th><th>Название</th><th>Раздел</th><th>Преподаватель</th><th>Курс</th><th></th></tr></thead>
+            <tbody class="js-sortable" data-sort-url="{{ route('admin.sort.update','courses') }}">
+            @foreach($courses as $course)
+                <tr data-sort-id="{{ $course->id }}">
+                    <td class="drag-handle">↕</td>
+                    <td><strong>{{ $course->title }}</strong></td>
+                    <td>{{ optional($course->section)->title }}</td>
+                    <td>{{ optional($course->instructor)->name ?: '—' }}</td>
+                    <td>{{ $course->study_year ? $course->study_year.' курс' : '—' }}</td>
+                    <td class="text-end">
+                        <a href="{{ route('admin.courses.lessons.index',$course) }}" class="btn btn-sm btn-outline-success">Уроки</a>
+                        <a href="{{ route('admin.courses.edit',$course) }}" class="btn btn-sm btn-outline-primary">Изменить</a>
+                        <form class="d-inline" method="post" action="{{ route('admin.courses.destroy',$course) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить?')">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="mt-3">{{ $courses->links() }}</div>
+@endsection

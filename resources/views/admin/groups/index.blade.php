@@ -1,1 +1,24 @@
-@extends('admin.layout') @section('title','Учебные группы') @section('content')<div class="d-flex justify-content-between align-items-center mb-4"><div><div class="small-label">Учебная часть</div><h1>Учебные группы</h1></div><a class="btn btn-primary" href="{{ route('admin.groups.create') }}">+ Создать группу</a></div><div class="row g-3">@foreach($groups as $g)<div class="col-md-6 col-xl-4"><div class="card admin-card shadow-sm h-100"><div class="card-body"><div class="d-flex justify-content-between"><div><div class="small text-muted">{{ $g->code ?: 'без кода' }}</div><h2 class="h5">{{ $g->name }}</h2></div><span class="badge text-bg-light">{{ $g->users_count }} студ.</span></div><div class="small text-muted">Куратор: {{ $g->curator?->name ?: 'не назначен' }}</div></div><div class="card-footer bg-white border-0"><a class="btn btn-sm btn-outline-primary" href="{{ route('admin.groups.edit',$g) }}">Управление</a></div></div></div>@endforeach</div><div class="mt-3">{{ $groups->links() }}</div>@endsection
+@extends('admin.layout')
+
+@section('title','Учебные группы')
+
+@section('content')
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div><div class="small-label">Учебная часть</div><h1>Учебные группы</h1></div>
+    <a class="btn btn-primary" href="{{ route('admin.groups.create') }}">+ Создать группу</a>
+</div>
+<div class="row g-3">
+@foreach($groups as $g)
+    <div class="col-md-6 col-xl-4">
+        <div class="card admin-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between"><div><div class="small text-muted">{{ $g->code ?: 'без кода' }}</div><h2 class="h5">{{ $g->name }}</h2></div><span class="badge text-bg-light">{{ $g->users_count }} студ.</span></div>
+                <div class="small text-muted">Куратор: {{ optional($g->curator)->name ?: 'не назначен' }}</div>
+            </div>
+            <div class="card-footer bg-white border-0"><a class="btn btn-sm btn-outline-primary" href="{{ route('admin.groups.edit',$g) }}">Управление</a></div>
+        </div>
+    </div>
+@endforeach
+</div>
+<div class="mt-3">{{ $groups->links() }}</div>
+@endsection
