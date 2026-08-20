@@ -55,7 +55,7 @@
 
 <div class="topline py-2">
     <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <span>Учебная часть {{ $college }}</span>
+        <span>{{ __('Учебная часть') }} {{ $college }}</span>
         <div class="d-flex flex-wrap gap-2 align-items-center">
             <button type="button" class="btn btn-sm btn-outline-light" id="a11yOn">{{ __('ui.accessibility') }}</button>
             <div class="dropdown">
@@ -64,6 +64,7 @@
                     <li><a class="dropdown-item" href="{{ route('locale.switch','ru') }}">{{ __('ui.russian') }}</a></li>
                     <li><a class="dropdown-item" href="{{ route('locale.switch','cv') }}">{{ __('ui.chuvash') }}</a></li>
                     <li><a class="dropdown-item" href="{{ route('locale.switch','mhr') }}">{{ __('ui.mari') }}</a></li>
+                    <li><a class="dropdown-item" href="{{ route('locale.switch','tt') }}">{{ __('ui.tatar') }}</a></li>
                 </ul>
             </div>
             <a class="text-white-50 text-decoration-none" href="{{ $collegeSite }}" target="_blank" rel="noopener">{{ __('ui.official_site') }} ↗</a>
@@ -74,7 +75,7 @@
 <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm">
     <div class="container">
         <a class="navbar-brand me-4" href="{{ route('home') }}"><span class="gold">♪</span> ПЕДСЛОВО</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Открыть меню"><span class="navbar-toggler-icon"></span></button>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="{{ __('Открыть меню') }}"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav main-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">{{ __('ui.home') }}</a></li>
