@@ -1,60 +1,6 @@
 <?php
-
 namespace Database\Seeders;
-
-use App\Models\Section;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
-
-class PortalStructureSeeder extends Seeder
-{
-    public function run(): void
-    {
-        $roots = [
-            'Юным дарованиям',
-            'Студентам и абитуриентам',
-            'Преподавателям и профессионалам',
-            'Взрослым любителям музыки',
-        ];
-
-        $map = [];
-        foreach ($roots as $i => $title) {
-            $map[$title] = Section::updateOrCreate(
-                ['slug' => Str::slug($title)],
-                ['parent_id' => null, 'title' => $title, 'type' => 'audience', 'sort_order' => $i + 1, 'is_active' => true]
-            );
-        }
-
-        $student = $map['Студентам и абитуриентам'];
-        $specialties = [
-            'Музыкальное искусство эстрады',
-            'Инструментальное исполнительство',
-            'Вокальное искусство',
-            'Сольное и хоровое народное пение',
-            'Хоровое дирижирование',
-            'Теория музыки',
-        ];
-        foreach ($specialties as $i => $title) {
-            Section::updateOrCreate(
-                ['slug' => Str::slug($title)],
-                ['parent_id' => $student->id, 'title' => $title, 'type' => 'specialty', 'sort_order' => $i + 1, 'is_active' => true]
-            );
-        }
-
-        $pro = $map['Преподавателям и профессионалам'];
-        foreach (['Повышение квалификации', 'Профессиональная переподготовка', 'Стажировка'] as $i => $title) {
-            Section::updateOrCreate(
-                ['slug' => Str::slug($title)],
-                ['parent_id' => $pro->id, 'title' => $title, 'type' => 'program', 'sort_order' => $i + 1, 'is_active' => true]
-            );
-        }
-
-        $young = $map['Юным дарованиям'];
-        foreach (['Детская школа искусств', 'Эстетические классы'] as $i => $title) {
-            Section::updateOrCreate(
-                ['slug' => Str::slug($title)],
-                ['parent_id' => $young->id, 'title' => $title, 'type' => 'program', 'sort_order' => $i + 1, 'is_active' => true]
-            );
-        }
-    }
+use App\Models\Section;use Illuminate\Database\Seeder;use Illuminate\Support\Str;
+class PortalStructureSeeder extends Seeder {
+ public function run(): void { $roots=['Юным дарованиям'=>'Материалы Детской школы искусств, эстетических классов и программ раннего профессионального развития.','Студентам и абитуриентам'=>'Специальности училища, учебные дисциплины и материалы по 1–4 курсам.','Преподавателям и профессионалам'=>'Повышение квалификации, профессиональная переподготовка, стажировки и методические материалы.','Взрослым любителям музыки'=>'Образовательные материалы и программы для взрослых любителей музыки.'];$map=[];$i=0;foreach($roots as $title=>$description){$map[$title]=Section::updateOrCreate(['slug'=>Str::slug($title)],['parent_id'=>null,'title'=>$title,'type'=>'audience','description'=>$description,'sort_order'=>++$i,'is_active'=>true]);}$student=$map['Студентам и абитуриентам'];$specialties=['Музыкальное искусство эстрады','Инструментальное исполнительство','Вокальное искусство','Сольное и хоровое народное пение','Хоровое дирижирование','Теория музыки'];foreach($specialties as $i=>$title)Section::updateOrCreate(['slug'=>Str::slug($title)],['parent_id'=>$student->id,'title'=>$title,'type'=>'specialty','description'=>'Учебные дисциплины, программы и цифровые материалы специальности «'.$title.'» по 1–4 курсам.','sort_order'=>$i+1,'is_active'=>true]);$pro=$map['Преподавателям и профессионалам'];foreach(['Повышение квалификации','Профессиональная переподготовка','Стажировка'] as $i=>$title)Section::updateOrCreate(['slug'=>Str::slug($title)],['parent_id'=>$pro->id,'title'=>$title,'type'=>'program','sort_order'=>$i+1,'is_active'=>true]);$young=$map['Юным дарованиям'];foreach(['Детская школа искусств','Эстетические классы'] as $i=>$title)Section::updateOrCreate(['slug'=>Str::slug($title)],['parent_id'=>$young->id,'title'=>$title,'type'=>'program','sort_order'=>$i+1,'is_active'=>true]); }
 }
