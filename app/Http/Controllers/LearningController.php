@@ -27,7 +27,7 @@ class LearningController extends Controller
             ->first();
         abort_unless($enrollment || $request->user()->isAdmin(),403);
 
-        $lesson->load(['course','material','scormPackages','files']);
+        $lesson->load(['course','material','scormPackages','files','links']);
         $lessonProgress = LessonProgress::firstOrCreate(
             ['lesson_id'=>$lesson->id,'user_id'=>$request->user()->id],
             ['status'=>'in_progress','started_at'=>now()]
