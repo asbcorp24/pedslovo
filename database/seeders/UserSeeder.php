@@ -12,17 +12,17 @@ class UserSeeder extends Seeder
     {
         User::updateOrCreate(
             ['email' => 'admin@pedslovo.local'],
-            ['name' => 'Администратор', 'password' => Hash::make('ChangeMe123!'), 'role' => 'admin']
+            ['name' => 'Администратор', 'password' => Hash::make('ChangeMe123!'), 'role' => 'admin', 'approved_at' => now()]
         );
 
         User::updateOrCreate(
             ['email' => 'teacher@pedslovo.local'],
-            ['name' => 'Преподаватель', 'password' => Hash::make('ChangeMe123!'), 'role' => 'teacher']
+            ['name' => 'Преподаватель', 'password' => Hash::make('ChangeMe123!'), 'role' => 'teacher', 'approved_at' => now()]
         );
 
         User::updateOrCreate(
             ['email' => 'student@pedslovo.local'],
-            ['name' => 'Студент', 'password' => Hash::make('ChangeMe123!'), 'role' => 'student']
+            ['name' => 'Студент', 'password' => Hash::make('ChangeMe123!'), 'role' => 'student', 'approved_at' => now()]
         );
     }
 }
