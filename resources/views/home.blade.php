@@ -3,18 +3,23 @@
 @section('title', __('Педслово — учебная часть ЧМУ им. Ф.П. Павлова'))
 
 @section('content')
+@php
+    $static = function (string $key, $fallback = '') {
+        return \Illuminate\Support\Facades\Lang::has($key) ? __($key) : $fallback;
+    };
+@endphp
 <div class="container py-5">
     <section class="hero p-4 p-md-5 mb-5">
         <div class="row align-items-center">
             <div class="col-lg-8 position-relative" style="z-index:1">
                 <div class="text-uppercase small fw-bold gold mb-2">
-                    {{ $home['home_badge'] ?? __('Учебная часть') }}
+                    {{ $static('content.home.badge', $home['home_badge'] ?? __('Учебная часть')) }}
                 </div>
                 <h1 class="display-4 fw-bold">
-                    {{ $home['home_title'] ?? __('Педслово — цифровая образовательная среда училища') }}
+                    {{ $static('content.home.title', $home['home_title'] ?? __('Педслово — цифровая образовательная среда училища')) }}
                 </h1>
                 <p class="lead text-white-50">
-                    {{ $home['home_subtitle'] ?? __('Учебные материалы, курсы и цифровые сервисы для студентов и преподавателей.') }}
+                    {{ $static('content.home.subtitle', $home['home_subtitle'] ?? __('Учебные материалы, курсы и цифровые сервисы для студентов и преподавателей.')) }}
                 </p>
 
                 @auth
@@ -28,15 +33,18 @@
 
     <div class="row g-4 mb-5">
         @foreach($sections as $section)
+            @php
+                $sectionKey = 'content.sections.'.$section->slug;
+                $sectionTitle = $static($sectionKey.'.title', $section->title);
+                $sectionDescription = $static($sectionKey.'.description', $section->description ?: __('Программы, материалы и учебные направления'));
+            @endphp
             <div class="col-md-6 col-xl-3">
                 <a class="text-decoration-none text-dark" href="{{ route('section.show', $section) }}">
                     <div class="card section-card shadow-sm h-100">
                         <div class="card-body p-4">
                             <div class="gold fs-2 mb-2">♪</div>
-                            <h2 class="h4">{{ $section->title }}</h2>
-                            <p class="text-muted">
-                                {{ $section->description ?: __('Программы, материалы и учебные направления') }}
-                            </p>
+                            <h2 class="h4">{{ $sectionTitle }}</h2>
+                            <p class="text-muted">{{ $sectionDescription }}</p>
                             <span class="small fw-semibold">{{ __('Открыть раздел →') }}</span>
                         </div>
                     </div>
@@ -59,7 +67,7 @@
                     <a href="{{ route('section.show', $specialty) }}" class="text-decoration-none text-dark">
                         <div class="card content-card shadow-sm h-100">
                             <div class="card-body p-4">
-                                <h3 class="h5">{{ $specialty->title }}</h3>
+                                <h3 class="h5">{{ __($specialty->title) }}</h3>
                                 <div class="d-flex flex-wrap gap-2 mt-3">
                                     @for($year = 1; $year <= 4; $year++)
                                         <span class="year-pill">{{ $year }} {{ __('курс') }}</span>
@@ -80,11 +88,11 @@
         <div class="row align-items-center">
             <div class="col-lg-5">
                 <div class="text-uppercase small fw-bold gold">{{ __('О системе') }}</div>
-                <h2>{{ $home['home_about_title'] ?? __('Учиться и преподавать в одной системе') }}</h2>
+                <h2>{{ __($home['home_about_title'] ?? 'Учиться и преподавать в одной системе') }}</h2>
             </div>
             <div class="col-lg-7">
                 <p class="lead text-muted mb-0">
-                    {{ $home['home_about_text'] ?? __('Педслово объединяет учебные материалы, курсы, результаты и цифровые сервисы учебной части.') }}
+                    {{ __($home['home_about_text'] ?? 'Педслово объединяет учебные материалы, курсы, результаты и цифровые сервисы учебной части.') }}
                 </p>
             </div>
         </div>
@@ -101,8 +109,8 @@
                                 <span class="badge text-bg-light">
                                     {{ $course->study_year ? $course->study_year . ' ' . __('курс') : __('курс') }}
                                 </span>
-                                <h3 class="h6 mt-2">{{ $course->title }}</h3>
-                                <div class="small text-muted">{{ optional($course->section)->title }}</div>
+                                <h3 class="h6 mt-2">{{ __($course->title) }}</h3>
+                                <div class="small text-muted">{{ optional($course->section)->title ? __(optional($course->section)->title) : '' }}</div>
                             </div>
                         </div>
                     </a>
@@ -118,13 +126,13 @@
                 <div class="col-md-6">
                     <div class="card content-card shadow-sm">
                         <div class="card-body">
-                            <span class="badge text-bg-light">{{ $material->material_type }}</span>
+                            <span class="badge text-bg-light">{{ __($material->material_type) }}</span>
                             <h3 class="h5 mt-2">
                                 <a href="{{ route('material.show', $material) }}" class="text-dark text-decoration-none">
-                                    {{ $material->title }}
+                                    {{ __($material->title) }}
                                 </a>
                             </h3>
-                            <p class="text-muted mb-0">{{ $material->annotation }}</p>
+                            <p class="text-muted mb-0">{{ $material->annotation ? __($material->annotation) : '' }}</p>
                         </div>
                     </div>
                 </div>
