@@ -16,7 +16,7 @@ class LessonController extends Controller
 {
     public function index(Course $course)
     {
-        $course->load(['lessons.material','lessons.scormPackages','lessons.files']);
+        $course->load(['lessons.material','lessons.scormPackages','lessons.files','lessons.links']);
         return view('admin.lessons.index',compact('course'));
     }
 
@@ -39,6 +39,7 @@ class LessonController extends Controller
         $this->syncExistingScorm($request,$lesson);
         $this->storeFiles($request,$lesson);
         $this->storeScormFiles($request,$lesson);
+        $this->syncVideoLinks($request,$lesson);
 
         return redirect()->route('admin.courses.lessons.index',$course)->with('success','Урок добавлен');
     }
@@ -46,7 +47,7 @@ class LessonController extends Controller
     public function edit(Course $course, Lesson $lesson)
     {
         abort_unless((int)$lesson->course_id === (int)$course->id,404);
-        $lesson->load(['files','scormPackages']);
+        $lesson->load(['files','scormPackages','links']);
         return view('admin.lessons.form',[
             'course'=>$course,
             'lesson'=>$lesson,
@@ -63,6 +64,7 @@ class LessonController extends Controller
         $this->syncExistingScorm($request,$lesson);
         $this->storeFiles($request,$lesson);
         $this->storeScormFiles($request,$lesson);
+        $this->syncVideoLinks($request,$lesson);
 
         return redirect()->route('admin.courses.lessons.index',$course)->with('success','Урок обновлён');
     }
@@ -109,24 +111,73 @@ class LessonController extends Controller
             'scorm_files'=>'nullable|array',
             'scorm_files.*'=>'file|mimes:zip|max:512000',
             'scorm_max_attempts'=>'nullable|integer|min:1|max:100',
-            'scorm_pass_score'=>'nullable|numeric|min:0|max:100'
+            'scorm_pass_score'=>'nullable|numeric|min:0|max:100',
+            'video_links'=>'nullable|string|max:20000'
         ]);
 
-        unset($data['files'],$data['scorm_files'],$data['scorm_package_ids'],$data['scorm_max_attempts'],$data['scorm_pass_score']);
+        unset($data['files'],$data['scorm_files'],$data['scorm_package_ids'],$data['scorm_max_attempts'],$data['scorm_pass_score'],$data['video_links']);
         $data['is_required'] = $request->boolean('is_required');
         $data['is_active'] = $request->boolean('is_active');
-
-        // Урок теперь контейнер: тип не ограничивает набор ресурсов.
-        // material_id сохраняется независимо от PDF/видео/SCORM-вложений.
         return $data;
+    }
+
+    private function syncVideoLinks(Request $request, Lesson $lesson)
+    {
+        $raw = trim((string)$request->input('video_links',''));
+        $lesson->links()->delete();
+        if ($raw === '') return;
+
+        $lines = preg_split('/\r\n|\r|\n/', $raw);
+        $sort = 0;
+        foreach ($lines as $line) {
+            $url = trim($line);
+            if ($url === '') continue;
+            if (!filter_var($url,FILTER_VALIDATE_URL)) {
+                abort(422,'Некорректная ссылка на видео: '.$url);
+            }
+            $parsed = $this->parseVideoUrl($url);
+            $lesson->links()->create([
+                'title'=>$parsed['title'],
+                'provider'=>$parsed['provider'],
+                'url'=>$url,
+                'embed_url'=>$parsed['embed_url'],
+                'sort_order'=>$sort++
+            ]);
+        }
+    }
+
+    private function parseVideoUrl($url)
+    {
+        $host = strtolower((string)parse_url($url,PHP_URL_HOST));
+        $path = trim((string)parse_url($url,PHP_URL_PATH),'/');
+        $query = [];
+        parse_str((string)parse_url($url,PHP_URL_QUERY),$query);
+
+        if (in_array($host,['youtube.com','www.youtube.com','m.youtube.com','youtu.be'],true)) {
+            $id = null;
+            if ($host === 'youtu.be') $id = explode('/',$path)[0] ?? null;
+            elseif (!empty($query['v'])) $id = $query['v'];
+            elseif (preg_match('~^(?:shorts|embed|live)/([^/]+)~',$path,$m)) $id = $m[1];
+            if ($id && preg_match('/^[A-Za-z0-9_-]{6,20}$/',$id)) {
+                return ['provider'=>'youtube','title'=>'YouTube','embed_url'=>'https://www.youtube.com/embed/'.$id];
+            }
+        }
+
+        if (in_array($host,['rutube.ru','www.rutube.ru'],true)) {
+            $id = null;
+            if (preg_match('~^(?:video|play/embed)/([A-Za-z0-9_-]+)~',$path,$m)) $id = $m[1];
+            if ($id) {
+                return ['provider'=>'rutube','title'=>'Rutube','embed_url'=>'https://rutube.ru/play/embed/'.$id];
+            }
+        }
+
+        return ['provider'=>'external','title'=>'Внешнее видео','embed_url'=>null];
     }
 
     private function syncExistingScorm(Request $request, Lesson $lesson)
     {
         $ids = collect($request->input('scorm_package_ids',[]))->map(function($id){ return (int)$id; })->filter()->unique()->values()->all();
         $lesson->scormPackages()->sync($ids);
-
-        // Старое поле поддерживаем как ссылку на первый пакет.
         $lesson->update(['scorm_package_id'=>$ids ? $ids[0] : null]);
     }
 
