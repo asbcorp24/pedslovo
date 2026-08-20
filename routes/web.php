@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\MaterialController as AdminMaterialController;
 use App\Http\Controllers\Admin\ScormController as AdminScormController;
 use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Admin\LessonController as AdminLessonController;
+use App\Http\Controllers\Admin\LessonRequirementController;
 use App\Http\Controllers\Admin\JournalController as AdminJournalController;
 use App\Http\Controllers\Admin\GroupController as AdminGroupController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -23,6 +24,12 @@ use App\Http\Controllers\Admin\SortController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\ScormResultsController;
+
+Route::get('/locale/{locale}',function($locale){
+    abort_unless(in_array($locale,['ru','cv','mhr'],true),404);
+    session(['locale'=>$locale]);
+    return back();
+})->name('locale.switch');
 
 Route::get('/',[HomeController::class,'index'])->name('home');
 Route::get('/section/{section:slug}',[SectionController::class,'show'])->name('section.show');
@@ -42,6 +49,7 @@ Route::middleware('auth')->group(function(){
     Route::get('/my-courses',[LearningController::class,'myCourses'])->name('learning.my-courses');
     Route::get('/lesson/{lesson}',[LearningController::class,'lesson'])->name('learning.lesson');
     Route::post('/lesson/{lesson}/complete',[LearningController::class,'complete'])->name('learning.lesson.complete');
+    Route::post('/lesson/{lesson}/resource/{type}/{resourceId}/complete',[LearningController::class,'completeResource'])->name('learning.resource.complete');
     Route::get('/certificates',[CertificateController::class,'index'])->name('certificates.index');
     Route::get('/certificates/{certificate}',[CertificateController::class,'show'])->name('certificates.show');
     Route::get('/scorm/{scorm}/launch',[ScormPlayerController::class,'launch'])->name('scorm.launch');
@@ -56,6 +64,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(func
     Route::resource('courses',AdminCourseController::class)->except('show');
     Route::resource('courses.lessons',AdminLessonController::class)->except('show');
     Route::delete('/courses/{course}/lessons/{lesson}/files/{file}',[AdminLessonController::class,'destroyFile'])->name('courses.lessons.files.destroy');
+    Route::get('/courses/{course}/lessons/{lesson}/requirements',[LessonRequirementController::class,'edit'])->name('courses.lessons.requirements.edit');
+    Route::put('/courses/{course}/lessons/{lesson}/requirements',[LessonRequirementController::class,'update'])->name('courses.lessons.requirements.update');
     Route::get('/scorm',[AdminScormController::class,'index'])->name('scorm.index');
     Route::post('/scorm',[AdminScormController::class,'store'])->name('scorm.store');
     Route::delete('/scorm/{scorm}',[AdminScormController::class,'destroy'])->name('scorm.destroy');
