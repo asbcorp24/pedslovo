@@ -26,7 +26,7 @@ use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\ScormResultsController;
 
 Route::get('/locale/{locale}',function($locale){
-    abort_unless(in_array($locale,['ru','cv','mhr'],true),404);
+    abort_unless(in_array($locale,['ru','cv','mhr','tt'],true),404);
     session(['locale'=>$locale]);
     return back();
 })->name('locale.switch');
