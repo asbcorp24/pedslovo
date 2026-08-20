@@ -68,6 +68,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(func
     Route::middleware('role:admin')->group(function(){
         Route::resource('groups',AdminGroupController::class)->except('show');
         Route::post('/groups/{group}/assign-courses',[AdminGroupController::class,'assignCourses'])->name('groups.assign-courses');
+        Route::get('/users/credentials',[AdminUserController::class,'credentials'])->name('users.credentials');
         Route::resource('users',AdminUserController::class)->except('show');
         Route::post('/users/import',[AdminUserController::class,'import'])->name('users.import');
         Route::post('/users/bulk-group',[AdminUserController::class,'bulkGroup'])->name('users.bulk-group');
