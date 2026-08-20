@@ -8,7 +8,7 @@ class StudentCredentialCipher
 {
     private function encrypter(): Encrypter
     {
-        $secret = (string) env('STUDENT_PASSWORD_KEY', '');
+        $secret = (string) config('app.student_password_key');
         if ($secret === '') {
             $secret = (string) config('app.key');
         }
