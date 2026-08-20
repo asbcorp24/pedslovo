@@ -1,10 +1,3 @@
 <?php
-namespace App\Http\Controllers\Admin;
-use App\Http\Controllers\Controller;
-use App\Models\Course;
-use App\Models\Enrollment;
-use App\Models\LessonProgress;
-class JournalController extends Controller {
- public function index(){return view('admin.journal.index',['courses'=>Course::withCount('enrollments')->orderBy('title')->get()]);}
- public function show(Course $course){$course->load(['lessons'=>fn($q)=>$q->where('is_active',true)->orderBy('sort_order')]);$enrollments=Enrollment::with('user')->where('course_id',$course->id)->orderBy('enrolled_at')->get();$progress=LessonProgress::whereIn('user_id',$enrollments->pluck('user_id'))->whereIn('lesson_id',$course->lessons->pluck('id'))->get()->keyBy(fn($p)=>$p->user_id.':'.$p->lesson_id);return view('admin.journal.show',compact('course','enrollments','progress'));}
-}
+namespace App\Http\Controllers\Admin;use App\Http\Controllers\Controller;use App\Models\Course;use App\Models\Enrollment;use App\Models\Group;use App\Models\LessonProgress;use App\Models\User;use Illuminate\Http\Request;
+class JournalController extends Controller{public function index(Request $r){$q=Course::withCount('enrollments')->with('section');if($r->filled('instructor_id'))$q->where('instructor_id',$r->instructor_id);if($r->filled('study_year'))$q->where('study_year',$r->study_year);return view('admin.journal.index',['courses'=>$q->orderBy('title')->get(),'teachers'=>User::where('role','teacher')->orderBy('name')->get()]);}public function show(Request $r,Course $course){$course->load(['lessons'=>fn($q)=>$q->where('is_active',true)->orderBy('sort_order')]);$e=Enrollment::with(['user.groups'])->where('course_id',$course->id);if($r->filled('group_id'))$e->whereHas('user.groups',fn($q)=>$q->where('groups.id',$r->group_id));if($r->filled('student')){$s=$r->student;$e->whereHas('user',fn($q)=>$q->where('name','like',"%$s%")->orWhere('email','like',"%$s%"));}$enrollments=$e->orderBy('enrolled_at')->get();$progress=LessonProgress::whereIn('user_id',$enrollments->pluck('user_id'))->whereIn('lesson_id',$course->lessons->pluck('id'))->get()->keyBy(fn($p)=>$p->user_id.':'.$p->lesson_id);if($r->filled('status'))$enrollments=$enrollments->filter(function($en)use($r,$progress,$course){foreach($course->lessons as $l){$p=$progress->get($en->user_id.':'.$l->id);if(($p->status??'not_started')===$r->status)return true;}return false;});return view('admin.journal.show',compact('course','enrollments','progress')+['groups'=>Group::orderBy('name')->get()]);}}

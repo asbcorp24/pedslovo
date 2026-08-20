@@ -1,0 +1,3 @@
+<?php
+namespace App\Http\Controllers\Admin;use App\Http\Controllers\Controller;use App\Models\ScormAttempt;use App\Models\User;use Illuminate\Http\Request;
+class ScormResultsController extends Controller{public function index(Request $r){$q=User::whereHas('scormAttempts')->withCount('scormAttempts');if($r->filled('q')){$s=$r->q;$q->where(fn($x)=>$x->where('name','like',"%$s%")->orWhere('email','like',"%$s%"));}return view('admin.scorm.results-index',['users'=>$q->orderBy('name')->paginate(40)->withQueryString()]);}public function show(User $user){$attempts=ScormAttempt::with(['package','lesson.course'])->where('user_id',$user->id)->latest('started_at')->paginate(50);return view('admin.scorm.results-user',compact('user','attempts'));}}
