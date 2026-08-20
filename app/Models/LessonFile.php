@@ -7,15 +7,12 @@ use Illuminate\Support\Facades\Storage;
 class LessonFile extends Model
 {
     protected $fillable = [
-        'lesson_id','original_name','path','mime_type','size','is_primary','launch_path'
+        'lesson_id','original_name','path','mime_type','size','is_primary','is_required','launch_path'
     ];
 
-    protected $casts = ['is_primary' => 'boolean'];
+    protected $casts = ['is_primary'=>'boolean','is_required'=>'boolean'];
 
-    public function lesson()
-    {
-        return $this->belongsTo(Lesson::class);
-    }
+    public function lesson(){ return $this->belongsTo(Lesson::class); }
 
     public function getUrlAttribute()
     {
@@ -24,9 +21,7 @@ class LessonFile extends Model
 
     public function getLaunchUrlAttribute()
     {
-        if (!$this->launch_path) {
-            return null;
-        }
+        if (!$this->launch_path) return null;
         return Storage::disk('public')->url($this->launch_path);
     }
 }
