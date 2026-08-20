@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -17,7 +17,7 @@
     $returnUrl = $attempt->lesson_id ? route('learning.lesson',$attempt->lesson_id) : route('home');
 @endphp
 <div class="bar">
-    <a href="{{ $returnUrl }}">← Назад к уроку</a>
+    <a href="{{ $returnUrl }}">← {{ __('Назад к уроку') }}</a>
     <div class="title">{{ $scorm->title }}</div>
     <span>SCORM {{ $scorm->version }}</span>
 </div>
