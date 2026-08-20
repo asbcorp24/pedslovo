@@ -7,8 +7,8 @@
 <h1 class="mt-2">{{ $lesson->exists ? 'Редактирование урока' : 'Новый урок' }}</h1>
 
 <div class="alert alert-light border">
-    Один урок может одновременно содержать несколько документов, учебник/PDF, видео, аудио, HTML-материалы и один или несколько SCORM/iSpring-тестов.
-    Все новые файлы урока хранятся в отдельной папке <code>storage/app/public/lessons/{id}/</code>.
+    Один урок может одновременно содержать несколько документов, учебник/PDF, видеофайлы, ссылки YouTube/Rutube, аудио, HTML-материалы и один или несколько SCORM/iSpring-тестов.
+    Все загружаемые файлы урока хранятся отдельно в <code>storage/app/public/lessons/{id}/</code>.
 </div>
 
 <form method="post"
@@ -59,6 +59,19 @@
                     <div class="form-text">
                         Можно выбрать сразу несколько файлов: PDF, DOC/DOCX, XLS/XLSX, PPT/PPTX, HTML, ZIP с HTML-сайтом, MP4/WebM, MP3/WAV, изображения и т.д. Максимум 100 МБ на файл.
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card admin-card border border-info-subtle">
+                <div class="card-body">
+                    <h2 class="h5">Видео по ссылке: YouTube / Rutube</h2>
+                    @php
+                        $savedVideoLinks = $lesson->exists ? $lesson->links->pluck('url')->join("\n") : '';
+                    @endphp
+                    <textarea class="form-control font-monospace" rows="5" name="video_links" placeholder="https://www.youtube.com/watch?v=...&#10;https://rutube.ru/video/.../">{{ old('video_links',$savedVideoLinks) }}</textarea>
+                    <div class="form-text">По одной ссылке на строку. YouTube и Rutube будут показаны встроенным видеоплеером прямо внутри урока. Можно добавить несколько ссылок.</div>
                 </div>
             </div>
         </div>
@@ -136,6 +149,20 @@
 </form>
 
 @if($lesson->exists)
+    @if($lesson->links->count())
+        <div class="card admin-card shadow-sm mt-4">
+            <div class="card-body">
+                <h2 class="h5">Видео по внешним ссылкам</h2>
+                @foreach($lesson->links as $link)
+                    <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                        <div><strong>{{ $link->title ?: $link->provider }}</strong><div class="small text-muted text-break">{{ $link->url }}</div></div>
+                        <a class="btn btn-sm btn-outline-primary" href="{{ $link->url }}" target="_blank" rel="noopener">Открыть</a>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     @if($lesson->scormPackages->count())
         <div class="card admin-card shadow-sm mt-4">
             <div class="card-body">
