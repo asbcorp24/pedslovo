@@ -50,7 +50,7 @@
                         <td class="text-end">
                             <div class="d-inline-flex gap-1">
                                 @if(!$u->approved_at)
-                                    <button type="submit" class="btn btn-sm btn-success" formaction="{{ route('admin.users.approve',$u) }}" formmethod="post" name="_approve" value="1">Подтвердить</button>
+                                    <button type="submit" class="btn btn-sm btn-success" formaction="{{ route('admin.users.approve',$u) }}" formmethod="post" formnovalidate name="_approve" value="1">Подтвердить</button>
                                 @endif
                                 <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.users.edit',$u) }}">Изменить</a>
                             </div>
