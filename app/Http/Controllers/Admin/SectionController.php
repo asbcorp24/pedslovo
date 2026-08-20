@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Course;
 use App\Models\Section;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,7 @@ class SectionController extends Controller
             'section' => new Section,
             'parents' => Section::with('translations')->orderBy('title')->get(),
             'locales' => self::LOCALES,
+            'availableCourses' => collect(),
         ]);
     }
 
@@ -48,10 +50,19 @@ class SectionController extends Controller
             'children.courses.lessons',
         ]);
 
+        $sectionIds = collect([$section->id])->merge($section->children->pluck('id'))->all();
+        $availableCourses = Course::with('section')
+            ->where(function ($q) use ($sectionIds) {
+                $q->whereNull('section_id')->orWhereNotIn('section_id', $sectionIds);
+            })
+            ->orderBy('title')
+            ->get();
+
         return view('admin.sections.form', [
             'section' => $section,
             'parents' => Section::with('translations')->whereKeyNot($section->id)->orderBy('title')->get(),
             'locales' => self::LOCALES,
+            'availableCourses' => $availableCourses,
         ]);
     }
 
@@ -65,6 +76,18 @@ class SectionController extends Controller
         });
 
         return redirect()->route('admin.sections.index')->with('ok', 'Раздел обновлён');
+    }
+
+    public function assignCourse(Request $request, Section $section)
+    {
+        $data = $request->validate([
+            'course_id' => 'required|exists:courses,id',
+        ]);
+
+        $course = Course::findOrFail($data['course_id']);
+        $course->update(['section_id' => $section->id]);
+
+        return back()->with('ok', 'Готовый курс «'.$course->title.'» привязан к разделу «'.$section->localizedTitle('ru').'».');
     }
 
     public function destroy(Section $section)
