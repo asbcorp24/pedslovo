@@ -9,6 +9,7 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CabinetController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ScormPlayerController;
+use App\Http\Controllers\HelpController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SectionController as AdminSectionController;
 use App\Http\Controllers\Admin\MaterialController as AdminMaterialController;
@@ -44,6 +45,7 @@ Route::post('/logout',[AuthController::class,'logout'])->middleware('auth')->nam
 
 Route::middleware('auth')->group(function(){
     Route::get('/cabinet',[CabinetController::class,'index'])->name('cabinet');
+    Route::get('/help',[HelpController::class,'index'])->name('help');
     Route::get('/teacher/journal/{course}',[CabinetController::class,'teacherJournal'])->middleware('role:teacher')->name('teacher.journal');
     Route::post('/course/{course:slug}/enroll',[CourseController::class,'enroll'])->name('courses.enroll');
     Route::get('/my-courses',[LearningController::class,'myCourses'])->name('learning.my-courses');
