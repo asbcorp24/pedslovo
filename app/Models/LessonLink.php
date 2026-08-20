@@ -5,10 +5,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class LessonLink extends Model
 {
-    protected $fillable = ['lesson_id','title','provider','url','embed_url','sort_order'];
+    protected $fillable = ['lesson_id','title','provider','url','embed_url','sort_order','is_required'];
+    protected $casts = ['is_required'=>'boolean'];
 
-    public function lesson()
-    {
-        return $this->belongsTo(Lesson::class);
-    }
+    public function lesson(){ return $this->belongsTo(Lesson::class); }
 }
