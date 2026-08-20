@@ -1,3 +1,19 @@
 @extends('admin.layout')
+
 @section('title','SEO')
-@section('content')<div class="d-flex justify-content-between align-items-center mb-4"><div><h1 class="h2 mb-1">SEO</h1><p class="text-muted mb-0">Meta title, description, Open Graph, canonical и robots для страниц сайта.</p></div><a class="btn btn-primary" href="{{ route('admin.seo.create') }}">Добавить страницу</a></div><div class="card admin-card"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th class="p-3">Название</th><th>Путь</th><th>Title</th><th>Robots</th><th></th></tr></thead><tbody>@forelse($pages as $p)<tr><td class="p-3 fw-semibold">{{ $p->name }}</td><td><code>{{ $p->path }}</code></td><td>{{ $p->title }}</td><td><span class="badge bg-light text-dark">{{ $p->robots }}</span></td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{{ route('admin.seo.edit',$p) }}">Изменить</a><form class="d-inline" method="post" action="{{ route('admin.seo.destroy',$p) }}">@csrf @method('DELETE')<button class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить SEO-настройку?')">Удалить</button></form></td></tr>@empty<tr><td colspan="5" class="p-4 text-muted">SEO-настройки ещё не созданы.</td></tr>@endforelse</tbody></table></div></div><div class="mt-3">{{ $pages->links() }}</div><div class="alert alert-light border mt-4"><strong>Подсказка:</strong> путь <code>*</code> используется как SEO по умолчанию. Для главной страницы укажите <code>/</code>. Для конкретной страницы — её путь, например <code>/section/vokalnoe-iskusstvo</code>.</div>@endsection
+
+@section('content')
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div><h1 class="h2 mb-1">SEO</h1><p class="text-muted mb-0">Meta title, description, Open Graph, canonical и robots для страниц сайта.</p></div>
+    <a class="btn btn-primary" href="{{ route('admin.seo.create') }}">Добавить страницу</a>
+</div>
+<div class="card admin-card"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th class="p-3">Название</th><th>Путь</th><th>Title</th><th>Robots</th><th></th></tr></thead><tbody>
+@forelse($pages as $p)
+<tr><td class="p-3 fw-semibold">{{ $p->name }}</td><td><code>{{ $p->path }}</code></td><td>{{ $p->title }}</td><td><span class="badge bg-light text-dark">{{ $p->robots }}</span></td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{{ route('admin.seo.edit',$p) }}">Изменить</a><form class="d-inline" method="post" action="{{ route('admin.seo.destroy',$p) }}">@csrf @method('DELETE')<button class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить SEO-настройку?')">Удалить</button></form></td></tr>
+@empty
+<tr><td colspan="5" class="p-4 text-muted">SEO-настройки ещё не созданы.</td></tr>
+@endforelse
+</tbody></table></div></div>
+<div class="mt-3">{{ $pages->links() }}</div>
+<div class="alert alert-light border mt-4"><strong>Подсказка:</strong> путь <code>*</code> используется как SEO по умолчанию. Для главной страницы укажите <code>/</code>. Для конкретной страницы — её путь.</div>
+@endsection
