@@ -1,0 +1,12 @@
+<?php
+namespace App\Http\Controllers;
+use App\Models\Enrollment;
+use App\Models\Lesson;
+use App\Models\LessonProgress;
+use Illuminate\Http\Request;
+class LearningController extends Controller {
+ public function myCourses(Request $r){$enrollments=Enrollment::with(['course.lessons'])->where('user_id',$r->user()->id)->latest('enrolled_at')->get();$progress=LessonProgress::where('user_id',$r->user()->id)->get()->keyBy('lesson_id');return view('learning.my-courses',compact('enrollments','progress'));}
+ public function lesson(Request $r,Lesson $lesson){abort_unless($lesson->is_active,404);$enrollment=Enrollment::where('course_id',$lesson->course_id)->where('user_id',$r->user()->id)->first();abort_unless($enrollment||$r->user()->isAdmin(),403);$lesson->load(['course','material','scormPackage']);$lessonProgress=LessonProgress::firstOrCreate(['lesson_id'=>$lesson->id,'user_id'=>$r->user()->id],['status'=>'in_progress','started_at'=>now()]);if($lessonProgress->status==='not_started')$lessonProgress->update(['status'=>'in_progress','started_at'=>now()]);return view('learning.lesson',compact('lesson','lessonProgress'));}
+ public function complete(Request $r,Lesson $lesson){$enrollment=Enrollment::where('course_id',$lesson->course_id)->where('user_id',$r->user()->id)->first();abort_unless($enrollment||$r->user()->isAdmin(),403);$p=LessonProgress::firstOrCreate(['lesson_id'=>$lesson->id,'user_id'=>$r->user()->id]);$p->update(['status'=>'completed','started_at'=>$p->started_at?:now(),'completed_at'=>now()]);$this->refreshEnrollment($lesson->course_id,$r->user()->id);return back()->with('success','Урок отмечен как пройденный');}
+ private function refreshEnrollment($courseId,$userId){$enrollment=Enrollment::where('course_id',$courseId)->where('user_id',$userId)->first();if(!$enrollment)return;$required=Lesson::where('course_id',$courseId)->where('is_active',true)->where('is_required',true)->pluck('id');if($required->isEmpty())return;$done=LessonProgress::where('user_id',$userId)->whereIn('lesson_id',$required)->whereIn('status',['completed','passed'])->count();if($done===$required->count())$enrollment->update(['status'=>'completed','completed_at'=>now()]);}
+}
