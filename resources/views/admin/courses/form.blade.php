@@ -16,10 +16,21 @@
         <div class="col-md-3"><label class="form-label">Проходной балл курса</label><input type="number" step="0.01" min="0" max="100" name="pass_score" class="form-control" value="{{ old('pass_score',$course->pass_score) }}"></div>
         <div class="col-md-2"><label class="form-label">Порядок</label><input type="number" min="0" name="sort_order" class="form-control" value="{{ old('sort_order',$course->sort_order ?? 0) }}"></div>
         <div class="col-12"><label class="form-label">Описание</label><textarea name="description" class="form-control" rows="5">{{ old('description',$course->description) }}</textarea></div>
-        <div class="col-12">
-            <div class="form-check"><input type="checkbox" class="form-check-input" name="is_active" value="1" @checked(old('is_active',$course->exists ? $course->is_active : true))><label class="form-check-label">Опубликован</label></div>
-            <div class="form-check"><input type="checkbox" class="form-check-input" name="certificate_enabled" value="1" @checked(old('certificate_enabled',$course->certificate_enabled))><label class="form-check-label">Выдавать сертификат после успешного завершения</label></div>
-        </div>
+
+        <div class="col-12"><div class="card border-0 bg-light"><div class="card-body">
+            <h2 class="h6">Сертификат</h2>
+            <div class="form-check mb-3"><input type="checkbox" class="form-check-input" name="certificate_enabled" value="1" id="certificateEnabled" @checked(old('certificate_enabled',$course->certificate_enabled))><label class="form-check-label" for="certificateEnabled">Выдавать сертификат после успешного завершения</label></div>
+            <label class="form-label">Шаблон сертификата</label>
+            <select name="certificate_template_id" class="form-select">
+                <option value="">Стандартный сертификат</option>
+                @foreach($certificateTemplates as $template)
+                    <option value="{{ $template->id }}" @selected(old('certificate_template_id',$course->certificate_template_id)==$template->id)>{{ $template->name }} ({{ strtoupper($template->locale) }})</option>
+                @endforeach
+            </select>
+            <div class="form-text">Шаблоны создаются в разделе «Сертификаты» админки.</div>
+        </div></div></div>
+
+        <div class="col-12"><div class="form-check"><input type="checkbox" class="form-check-input" name="is_active" value="1" @checked(old('is_active',$course->exists ? $course->is_active : true))><label class="form-check-label">Опубликован</label></div></div>
     </div>
     <button class="btn btn-primary mt-4">Сохранить</button>
 </form>
